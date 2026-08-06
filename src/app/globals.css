@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface text-ink-primary dark:bg-surface dark:text-ink-primary;
+  }
+
+  html:not(.dark) body {
+    @apply bg-surface-light-DEFAULT text-ink-light-primary;
+  }
+}
