@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Palette de marque Guardian AI — accent ambre/orange, dark par défaut.
+// Palette de marque Guardian AI — accent bleu électrique/azur, dark par défaut.
 const config: Config = {
   darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
@@ -9,20 +9,20 @@ const config: Config = {
       colors: {
         // Surfaces
         surface: {
-          DEFAULT: "#0F0D0A", // fond principal (dark)
-          raised: "#18130D", // cartes / panneaux (dark)
+          DEFAULT: "#0A0D14", // fond principal (dark)
+          raised: "#12151F", // cartes / panneaux (dark)
           "light-DEFAULT": "#FFFFFF",
-          "light-raised": "#F9F5F0",
+          "light-raised": "#F5F7FA",
         },
-        // Accent ambre/orange
+        // Accent bleu électrique/azur
         accent: {
-          50: "#FFF7ED",
-          100: "#FFEDD5",
-          300: "#FDBA74",
-          400: "#FB923C",
-          500: "#F59E0B",
-          600: "#D97706",
-          700: "#B45309",
+          50: "#EFF6FF",
+          100: "#DBEAFE",
+          300: "#93C5FD",
+          400: "#60A5FA",
+          500: "#3B82F6",
+          600: "#2563EB",
+          700: "#1D4ED8",
         },
         // Texte
         ink: {
