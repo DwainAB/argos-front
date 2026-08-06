@@ -51,16 +51,16 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-white/10 bg-surface-raised transition-[width] duration-200 ${
+      className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-surface-border/10 bg-surface-raised transition-[width] duration-200 ${
         collapsed ? "w-16" : "w-60"
       }`}
     >
-      <div className={`flex h-14 items-center gap-2 border-b border-white/10 px-4 ${collapsed ? "justify-center" : "justify-between"}`}>
+      <div className={`flex h-14 items-center gap-2 border-b border-surface-border/10 px-4 ${collapsed ? "justify-center" : "justify-between"}`}>
         {collapsed ? (
           <button
             type="button"
             onClick={toggle}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-ink-secondary transition hover:bg-white/5 hover:text-ink-primary"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-ink-secondary transition hover:bg-surface-border/5 hover:text-ink-primary"
             aria-label="Afficher la barre de navigation"
           >
             <IconChevronRight className="h-4 w-4" />
@@ -84,7 +84,7 @@ export function Sidebar() {
             <button
               type="button"
               onClick={toggle}
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-ink-secondary transition hover:bg-white/5 hover:text-ink-primary"
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-ink-secondary transition hover:bg-surface-border/5 hover:text-ink-primary"
               aria-label="Masquer la barre de navigation"
             >
               <IconChevronLeft className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm transition ${
                 isActive
                   ? "bg-accent-500/10 text-accent-400"
-                  : "text-ink-secondary hover:bg-white/5 hover:text-ink-primary"
+                  : "text-ink-secondary hover:bg-surface-border/5 hover:text-ink-primary"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />

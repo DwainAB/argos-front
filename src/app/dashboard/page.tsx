@@ -44,13 +44,13 @@ export default function DashboardOverviewPage() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-surface-raised">
-          <ul className="divide-y divide-white/10">
+        <div className="overflow-hidden rounded-xl border border-surface-border/10 bg-surface-raised">
+          <ul className="divide-y divide-surface-border/10">
             {mockProjects.map((project) => (
               <li key={project.id}>
                 <Link
                   href={`/dashboard/projects/${project.id}`}
-                  className="flex items-center justify-between px-4 py-3 text-sm transition hover:bg-white/5"
+                  className="flex items-center justify-between px-4 py-3 text-sm transition hover:bg-surface-border/5"
                 >
                   <div className="flex items-center gap-3">
                     <span className={`h-2 w-2 shrink-0 rounded-full ${statusDotClasses[project.status]}`} />
@@ -78,8 +78,8 @@ export default function DashboardOverviewPage() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-surface-raised">
-          <ul className="divide-y divide-white/10">
+        <div className="overflow-hidden rounded-xl border border-surface-border/10 bg-surface-raised">
+          <ul className="divide-y divide-surface-border/10">
             {mockNotifications.map((notif) => (
               <li key={notif.id} className="flex items-start gap-3 px-4 py-3 text-sm">
                 <span className={`mt-0.5 text-xs font-medium uppercase ${levelClasses[notif.level]}`}>

@@ -7,14 +7,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Surfaces
+        // Surfaces — pilotées par des variables CSS (voir globals.css), s'adaptent
+        // automatiquement selon la présence de la classe "dark" sur <html>.
         surface: {
-          DEFAULT: "#0A0D14", // fond principal (dark)
-          raised: "#12151F", // cartes / panneaux (dark)
-          "light-DEFAULT": "#FFFFFF",
-          "light-raised": "#F5F7FA",
+          DEFAULT: "rgb(var(--surface) / <alpha-value>)",
+          raised: "rgb(var(--surface-raised) / <alpha-value>)",
+          border: "rgb(var(--surface-border) / <alpha-value>)",
         },
-        // Accent bleu électrique/azur
+        // Accent bleu électrique/azur (identique dans les deux thèmes)
         accent: {
           50: "#EFF6FF",
           100: "#DBEAFE",
@@ -24,14 +24,11 @@ const config: Config = {
           600: "#2563EB",
           700: "#1D4ED8",
         },
-        // Texte
+        // Texte — piloté par variables CSS, cf. globals.css
         ink: {
-          primary: "#E5E7EB",
-          secondary: "#9CA3AF",
-          muted: "#6B7280",
-          "light-primary": "#111827",
-          "light-secondary": "#4B5563",
-          "light-muted": "#9CA3AF",
+          primary: "rgb(var(--ink-primary) / <alpha-value>)",
+          secondary: "rgb(var(--ink-secondary) / <alpha-value>)",
+          muted: "rgb(var(--ink-muted) / <alpha-value>)",
         },
         // Statuts
         status: {
