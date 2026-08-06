@@ -3,11 +3,27 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-surface text-ink-primary dark:bg-surface dark:text-ink-primary;
+  :root {
+    /* Thème sombre (par défaut) — valeurs RGB "r g b" pour composer avec l'alpha Tailwind. */
+    --surface: 10 13 20; /* #0A0D14 */
+    --surface-raised: 18 21 31; /* #12151F */
+    --surface-border: 255 255 255; /* utilisé avec une faible opacité (bordures) */
+    --ink-primary: 229 231 235; /* #E5E7EB */
+    --ink-secondary: 156 163 175; /* #9CA3AF */
+    --ink-muted: 107 114 128; /* #6B7280 */
   }
 
-  html:not(.dark) body {
-    @apply bg-surface-light-DEFAULT text-ink-light-primary;
+  html:not(.dark) {
+    /* Thème clair */
+    --surface: 255 255 255;
+    --surface-raised: 245 247 250; /* #F5F7FA */
+    --surface-border: 17 24 39; /* utilisé avec une faible opacité (bordures) */
+    --ink-primary: 17 24 39; /* #111827 */
+    --ink-secondary: 75 85 99; /* #4B5563 */
+    --ink-muted: 156 163 175; /* #9CA3AF */
+  }
+
+  body {
+    @apply bg-surface text-ink-primary transition-colors duration-150;
   }
 }

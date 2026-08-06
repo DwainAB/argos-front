@@ -37,7 +37,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-surface-raised p-6 shadow-xl">
+        <div className="rounded-xl border border-surface-border/10 bg-surface-raised p-6 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="mb-1 block text-sm text-ink-secondary">
@@ -48,7 +48,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="vous@exemple.com"
-                className="w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
+                className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
               />
             </div>
 
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 type="password"
                 required
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-white/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
+                className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
               />
             </div>
 
@@ -74,16 +74,16 @@ export default function LoginPage() {
           </form>
 
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-surface-border/10" />
             <span className="text-xs text-ink-muted">ou</span>
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-surface-border/10" />
           </div>
 
           <div className="space-y-2">
             <button
               type="button"
               onClick={handleOAuthClick}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-surface py-2 text-sm font-medium text-ink-primary transition hover:bg-white/5"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-surface-border/10 bg-surface py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5"
             >
               <GoogleIcon className="h-4 w-4" />
               Continuer avec Google
@@ -92,7 +92,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={handleOAuthClick}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-surface py-2 text-sm font-medium text-ink-primary transition hover:bg-white/5"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-surface-border/10 bg-surface py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5"
             >
               <GithubIcon className="h-4 w-4" />
               Continuer avec GitHub

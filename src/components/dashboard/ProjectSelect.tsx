@@ -30,7 +30,7 @@ export function ProjectSelect() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-lg border border-white/10 bg-surface-raised px-3 py-1.5 text-sm text-ink-primary transition hover:bg-white/5"
+        className="flex items-center gap-2 rounded-lg border border-surface-border/10 bg-surface-raised px-3 py-1.5 text-sm text-ink-primary transition hover:bg-surface-border/5"
       >
         {activeProject ? (
           <>
@@ -47,14 +47,14 @@ export function ProjectSelect() {
       </button>
 
       {open && (
-        <div className="absolute left-0 z-20 mt-2 w-64 overflow-hidden rounded-lg border border-white/10 bg-surface-raised shadow-xl">
+        <div className="absolute left-0 z-20 mt-2 w-64 overflow-hidden rounded-lg border border-surface-border/10 bg-surface-raised shadow-xl">
           <button
             type="button"
             onClick={() => {
               setOpen(false);
               router.push("/dashboard");
             }}
-            className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-white/5 ${
+            className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-surface-border/5 ${
               !activeProject ? "text-accent-400" : "text-ink-primary"
             }`}
           >
@@ -62,7 +62,7 @@ export function ProjectSelect() {
             Vue globale
           </button>
 
-          <div className="my-1 h-px bg-white/10" />
+          <div className="my-1 h-px bg-surface-border/10" />
 
           <ul className="max-h-64 overflow-y-auto py-1">
             {mockProjects.map((project) => (
@@ -73,7 +73,7 @@ export function ProjectSelect() {
                     setOpen(false);
                     router.push(`/dashboard/projects/${project.id}`);
                   }}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-white/5 ${
+                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-surface-border/5 ${
                     activeProjectId === project.id ? "text-accent-400" : "text-ink-primary"
                   }`}
                 >
@@ -85,7 +85,7 @@ export function ProjectSelect() {
             ))}
           </ul>
 
-          <div className="my-1 h-px bg-white/10" />
+          <div className="my-1 h-px bg-surface-border/10" />
 
           <button
             type="button"
