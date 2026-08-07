@@ -1,8 +1,12 @@
+import { Suspense } from "react";
+import { NewProjectContent } from "./NewProjectContent";
+
+// useSearchParams (utilisé dans NewProjectContent pour lire le retour du flux OAuth Railway)
+// nécessite un Suspense boundary pour l'export statique de Next.js.
 export default function NewProjectPage() {
   return (
-    <div>
-      <h1 className="text-xl font-semibold text-ink-primary">Ajouter un projet</h1>
-      <p className="mt-1 text-sm text-ink-secondary">À construire prochainement.</p>
-    </div>
+    <Suspense fallback={null}>
+      <NewProjectContent />
+    </Suspense>
   );
 }
