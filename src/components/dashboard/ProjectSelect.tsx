@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { mockProjects, statusDotClasses, statusLabels } from "@/lib/mock-data";
+import { useProjects } from "@/lib/use-projects";
 import { IconChevronDown, IconPlus, IconProjects } from "@/components/icons/NavIcons";
 
 export function ProjectSelect() {
@@ -10,10 +10,11 @@ export function ProjectSelect() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { projects } = useProjects();
 
   const projectMatch = pathname.match(/^\/dashboard\/projects\/([^/]+)/);
   const activeProjectId = projectMatch?.[1];
-  const activeProject = mockProjects.find((p) => p.id === activeProjectId);
+  const activeProject = projects.find((p) => p.id === activeProjectId);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -34,7 +35,7 @@ export function ProjectSelect() {
       >
         {activeProject ? (
           <>
-            <span className={`h-2 w-2 shrink-0 rounded-full ${statusDotClasses[activeProject.status]}`} />
+            <span className="h-2 w-2 shrink-0 rounded-full bg-status-good" />
             <span className="max-w-[160px] truncate">{activeProject.name}</span>
           </>
         ) : (
@@ -65,7 +66,10 @@ export function ProjectSelect() {
           <div className="my-1 h-px bg-surface-border/10" />
 
           <ul className="max-h-64 overflow-y-auto py-1">
-            {mockProjects.map((project) => (
+            {projects.length === 0 && (
+              <li className="px-3 py-2 text-xs text-ink-muted">Aucun projet connecté pour l'instant.</li>
+            )}
+            {projects.map((project) => (
               <li key={project.id}>
                 <button
                   type="button"
@@ -77,9 +81,8 @@ export function ProjectSelect() {
                     activeProjectId === project.id ? "text-accent-400" : "text-ink-primary"
                   }`}
                 >
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${statusDotClasses[project.status]}`} />
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-status-good" />
                   <span className="flex-1 truncate">{project.name}</span>
-                  <span className="text-xs text-ink-muted">{statusLabels[project.status]}</span>
                 </button>
               </li>
             ))}
