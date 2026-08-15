@@ -1,12 +1,14 @@
+import type { ReactNode } from "react";
+
 type StatCardProps = {
   label: string;
   value: string;
-  hint?: string;
+  hint?: ReactNode;
   tone?: "default" | "good" | "warning" | "critical";
 };
 
 const toneClasses: Record<NonNullable<StatCardProps["tone"]>, string> = {
-  default: "text-ink-primary",
+  default: "text-ink-secondary",
   good: "text-status-good",
   warning: "text-status-warning",
   critical: "text-status-critical",
