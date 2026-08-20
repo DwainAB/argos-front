@@ -21,6 +21,32 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
   const [logs, setLogs] = useState<ApiLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLog, setSelectedLog] = useState<ApiLogEntry | null>(null);
+  const [explaining, setExplaining] = useState(false);
+  const [explainError, setExplainError] = useState<string | null>(null);
+
+  // Demande l'explication du log actuellement ouvert dans le panneau à l'IA locale
+  // (voir POST /api/logs/:id/explain côté backend). Met à jour la liste et le log
+  // sélectionné une fois la réponse reçue, pour que le résultat apparaisse immédiatement
+  // et reste affiché sans nouvel appel si le panneau est rouvert plus tard.
+  async function handleExplain(log: ApiLogEntry) {
+    setExplaining(true);
+    setExplainError(null);
+
+    try {
+      const res = await fetch(`${API_URL}/api/logs/${log.id}/explain`, { method: "POST" });
+      if (!res.ok) throw new Error("Réponse non OK");
+      const data = await res.json();
+
+      const updated = { ...log, aiSummary: data.explanation as string };
+      setSelectedLog(updated);
+      setLogs((prev) => prev.map((l) => (l.id === log.id ? updated : l)));
+    } catch (err) {
+      console.error("Erreur lors de la demande d'explication :", err);
+      setExplainError("Impossible d'obtenir une explication pour ce log. Réessayez.");
+    } finally {
+      setExplaining(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -68,7 +94,10 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
               <li key={log.id}>
                 <button
                   type="button"
-                  onClick={() => setSelectedLog(log)}
+                  onClick={() => {
+                    setSelectedLog(log);
+                    setExplainError(null);
+                  }}
                   className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm transition hover:bg-surface-border/5"
                 >
                   <CategoryBadge category={log.category} />
@@ -110,9 +139,17 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-ink-muted">
-                L'explication IA n'est pas encore disponible pour ce log.
-              </p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => handleExplain(selectedLog)}
+                  disabled={explaining}
+                  className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {explaining ? "Explication en cours..." : "Explication"}
+                </button>
+                {explainError && <p className="mt-2 text-xs text-status-critical">{explainError}</p>}
+              </div>
             )}
           </div>
         )}
