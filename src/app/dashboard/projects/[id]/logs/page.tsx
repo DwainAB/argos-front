@@ -25,9 +25,10 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
   const [explainError, setExplainError] = useState<string | null>(null);
 
   // Demande l'explication du log actuellement ouvert dans le panneau à l'IA locale
-  // (voir POST /api/logs/:id/explain côté backend). Met à jour la liste et le log
-  // sélectionné une fois la réponse reçue, pour que le résultat apparaisse immédiatement
-  // et reste affiché sans nouvel appel si le panneau est rouvert plus tard.
+  // (voir POST /api/logs/:id/explain côté backend). Si déjà en cache, le backend renvoie
+  // du JSON classique. Sinon la réponse est streamée en texte brut au fil de la génération
+  // par l'IA : on l'affiche au fur et à mesure en mettant à jour aiSummary à chaque chunk,
+  // plutôt que d'attendre la fin (qui peut prendre plusieurs secondes).
   async function handleExplain(log: ApiLogEntry) {
     setExplaining(true);
     setExplainError(null);
@@ -35,11 +36,32 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
     try {
       const res = await fetch(`${API_URL}/api/logs/${log.id}/explain`, { method: "POST" });
       if (!res.ok) throw new Error("Réponse non OK");
-      const data = await res.json();
 
-      const updated = { ...log, aiSummary: data.explanation as string };
-      setSelectedLog(updated);
-      setLogs((prev) => prev.map((l) => (l.id === log.id ? updated : l)));
+      const contentType = res.headers.get("content-type") ?? "";
+
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        const updated = { ...log, aiSummary: data.explanation as string };
+        setSelectedLog(updated);
+        setLogs((prev) => prev.map((l) => (l.id === log.id ? updated : l)));
+        return;
+      }
+
+      if (!res.body) throw new Error("Pas de flux de réponse");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        accumulated += decoder.decode(value, { stream: true });
+        const updated = { ...log, aiSummary: accumulated };
+        setSelectedLog(updated);
+        setLogs((prev) => prev.map((l) => (l.id === log.id ? updated : l)));
+      }
     } catch (err) {
       console.error("Erreur lors de la demande d'explication :", err);
       setExplainError("Impossible d'obtenir une explication pour ce log. Réessayez.");
