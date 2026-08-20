@@ -2,27 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/config";
-import { LevelBadge } from "@/components/dashboard/LevelBadge";
+import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
 import { SidePanel } from "@/components/dashboard/SidePanel";
-import type { LogLevel } from "@/lib/mock-data";
 
 type ApiLogEntry = {
   id: string;
   rawMessage: string;
   level: string;
+  category: string;
   source: string;
   aiSummary: string | null;
   createdAt: string;
 };
-
-// Le backend stocke le niveau tel que reçu de Railway (ex: "info", "warn", "error" en
-// minuscules, parfois d'autres variantes) — on le normalise vers nos 3 niveaux connus.
-function normalizeLevel(level: string): LogLevel {
-  const lower = level.toLowerCase();
-  if (lower.includes("err")) return "error";
-  if (lower.includes("warn")) return "warning";
-  return "info";
-}
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -80,11 +71,11 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
                   onClick={() => setSelectedLog(log)}
                   className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm transition hover:bg-surface-border/5"
                 >
-                  <LevelBadge level={normalizeLevel(log.level)} />
+                  <CategoryBadge category={log.category} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-mono text-xs text-ink-primary">{log.rawMessage}</p>
                     <p className="mt-1 text-xs text-ink-muted">
-                      {log.source} · {new Date(log.createdAt).toLocaleString("fr-FR")}
+                      {log.source} · {log.level} · {new Date(log.createdAt).toLocaleString("fr-FR")}
                     </p>
                   </div>
                 </button>
@@ -98,9 +89,9 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
         {selectedLog && (
           <div className="space-y-5">
             <div className="flex items-center gap-2">
-              <LevelBadge level={normalizeLevel(selectedLog.level)} />
+              <CategoryBadge category={selectedLog.category} />
               <span className="text-xs text-ink-muted">
-                {selectedLog.source} · {new Date(selectedLog.createdAt).toLocaleString("fr-FR")}
+                {selectedLog.source} · {selectedLog.level} · {new Date(selectedLog.createdAt).toLocaleString("fr-FR")}
               </span>
             </div>
 
