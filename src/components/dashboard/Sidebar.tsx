@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "./SidebarContext";
+import { API_URL } from "@/lib/config";
 import {
   IconOverview,
   IconProjects,
@@ -18,7 +20,10 @@ type NavItem = {
   label: string;
   href: string;
   icon: (props: { className?: string }) => JSX.Element;
+  badge?: number;
 };
+
+const POLL_INTERVAL_MS = 5000;
 
 // Navigation en vue globale : aucun projet sélectionné.
 const globalNavItems: NavItem[] = [
@@ -29,12 +34,12 @@ const globalNavItems: NavItem[] = [
 ];
 
 // Navigation en vue projet : contextuelle au projet sélectionné.
-function getProjectNavItems(projectId: string): NavItem[] {
+function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
   const base = `/dashboard/projects/${projectId}`;
   return [
     { label: "Aperçu", href: base, icon: IconOverview },
     { label: "Logs", href: `${base}/logs`, icon: IconLogs },
-    { label: "Alertes", href: `${base}/alerts`, icon: IconBell },
+    { label: "Alertes", href: `${base}/alerts`, icon: IconBell, badge: alertsCount },
     { label: "Intégrations", href: `${base}/integrations`, icon: IconIntegrations },
     { label: "Paramètres du projet", href: `${base}/settings`, icon: IconSettings },
   ];
@@ -47,7 +52,35 @@ export function Sidebar() {
   const projectMatch = pathname.match(/^\/dashboard\/projects\/([^/]+)/);
   const activeProjectId = projectMatch?.[1];
 
-  const items = activeProjectId ? getProjectNavItems(activeProjectId) : globalNavItems;
+  const [alertsCount, setAlertsCount] = useState(0);
+
+  useEffect(() => {
+    if (!activeProjectId) return;
+
+    let cancelled = false;
+
+    async function fetchAlertsCount() {
+      try {
+        const res = await fetch(`${API_URL}/api/projects/${activeProjectId}/alerts`);
+        const data = await res.json();
+        if (cancelled) return;
+        const alerts: unknown[] = data.alerts ?? [];
+        setAlertsCount(alerts.length);
+      } catch (err) {
+        console.error("Erreur lors du chargement du nombre d'alertes :", err);
+      }
+    }
+
+    fetchAlertsCount();
+    const interval = setInterval(fetchAlertsCount, POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [activeProjectId]);
+
+  const items = activeProjectId ? getProjectNavItems(activeProjectId, alertsCount) : globalNavItems;
 
   return (
     <aside
@@ -97,6 +130,7 @@ export function Sidebar() {
         {items.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
+          const hasBadge = !!item.badge;
           return (
             <Link
               key={item.href}
@@ -108,8 +142,24 @@ export function Sidebar() {
                   : "text-ink-secondary hover:bg-surface-border/5 hover:text-ink-primary"
               }`}
             >
-              <Icon className="h-4 w-4 shrink-0" />
-              {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
+              <span className="relative flex shrink-0">
+                <Icon className="h-4 w-4" />
+                {collapsed && hasBadge && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-status-critical text-[9px] font-medium leading-none text-white">
+                    {item.badge! > 9 ? "9+" : item.badge}
+                  </span>
+                )}
+              </span>
+              {!collapsed && (
+                <span className="flex flex-1 items-center justify-between gap-2">
+                  <span className="whitespace-nowrap">{item.label}</span>
+                  {hasBadge && (
+                    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-status-critical px-1.5 text-[11px] font-medium leading-none text-white">
+                      {item.badge}
+                    </span>
+                  )}
+                </span>
+              )}
             </Link>
           );
         })}
