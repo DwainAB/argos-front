@@ -9,6 +9,7 @@ type ApiAlert = {
   id: string;
   explanation: string;
   status: "open" | "fix_proposed" | "fix_accepted" | "fix_rejected";
+  resolvedAt: string | null;
   createdAt: string;
   proposedFilePath: string | null;
   proposedOldCode: string | null;
@@ -31,6 +32,8 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
   const [requestingFix, setRequestingFix] = useState(false);
   const [decidingFix, setDecidingFix] = useState(false);
   const [fixError, setFixError] = useState<string | null>(null);
+  const [togglingResolved, setTogglingResolved] = useState(false);
+  const [resolveError, setResolveError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,6 +76,28 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     }
   }
 
+  // Marque/démarque l'alerte comme traitée (voir POST /api/alerts/:id/resolve et /reopen
+  // côté backend). Indépendant du cycle de correction par IA.
+  async function handleToggleResolved() {
+    if (!alert) return;
+    setTogglingResolved(true);
+    setResolveError(null);
+
+    const action = alert.resolvedAt ? "reopen" : "resolve";
+
+    try {
+      const res = await fetch(`${API_URL}/api/alerts/${alert.id}/${action}`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
+      setAlert(data.alert);
+    } catch (err) {
+      console.error("Erreur lors du changement de statut traité :", err);
+      setResolveError("Impossible de mettre à jour le statut de cette alerte.");
+    } finally {
+      setTogglingResolved(false);
+    }
+  }
+
   async function handleDecideFix(decision: "accept" | "reject") {
     if (!alert) return;
     setDecidingFix(true);
@@ -108,10 +133,37 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
         >
           ← Retour aux alertes
         </Link>
-        <div className="mt-2 flex items-center gap-2">
-          <CategoryBadge category={alert.logEntry.category} />
-          <span className="text-xs text-ink-muted">{new Date(alert.createdAt).toLocaleString("fr-FR")}</span>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <CategoryBadge category={alert.logEntry.category} />
+            <span className="text-xs text-ink-muted">{new Date(alert.createdAt).toLocaleString("fr-FR")}</span>
+            {alert.resolvedAt && (
+              <span className="rounded-full border border-status-good/20 bg-status-good/10 px-2 py-0.5 text-xs font-medium text-status-good">
+                Traitée le {new Date(alert.resolvedAt).toLocaleString("fr-FR")}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleToggleResolved}
+              disabled={togglingResolved}
+              className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                alert.resolvedAt
+                  ? "border-surface-border/10 bg-surface text-ink-secondary hover:bg-surface-border/5 hover:text-ink-primary"
+                  : "border-status-good/20 bg-status-good/10 text-status-good hover:bg-status-good/20"
+              }`}
+            >
+              {togglingResolved
+                ? "Mise à jour..."
+                : alert.resolvedAt
+                  ? "Rouvrir l'alerte"
+                  : "Marquer comme traitée"}
+            </button>
+          </div>
         </div>
+        {resolveError && <p className="mt-2 text-xs text-status-critical">{resolveError}</p>}
       </div>
 
       <section className="rounded-xl border border-surface-border/10 bg-surface-raised p-4">
