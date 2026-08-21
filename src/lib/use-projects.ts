@@ -19,6 +19,15 @@ export function useProjects() {
   const [projects, setProjects] = useState<ApiProject[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const refetch = () => {
+    return fetch(`${API_URL}/api/projects`)
+      .then((res) => res.json())
+      .then((data) => {
+        setProjects(data.projects ?? []);
+      })
+      .catch((err) => console.error("Erreur lors du chargement des projets :", err));
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -37,5 +46,5 @@ export function useProjects() {
     };
   }, []);
 
-  return { projects, loading };
+  return { projects, loading, refetch };
 }

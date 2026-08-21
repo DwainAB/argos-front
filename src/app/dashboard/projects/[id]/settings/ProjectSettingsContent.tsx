@@ -26,7 +26,7 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const githubInstallationId = searchParams.get("github_installation_id");
   const githubError = searchParams.get("github_error");
 
-  const { projects, loading: projectsLoading } = useProjects();
+  const { projects, loading: projectsLoading, refetch: refetchProjects } = useProjects();
   const project = projects.find((p) => p.id === projectId);
 
   const [notified, setNotified] = useState<NotifiedPerson[]>([
@@ -49,6 +49,11 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
+  const [projectName, setProjectName] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [nameSaved, setNameSaved] = useState(false);
+
   // Une fois revenu de l'installation GitHub, on récupère la liste des repos accessibles.
   useEffect(() => {
     if (!githubInstallationId) return;
@@ -65,6 +70,11 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
       .catch((err) => setReposError(err.message))
       .finally(() => setLoadingRepos(false));
   }, [githubInstallationId]);
+
+  // Synchronise le champ nom avec le projet une fois chargé (et à chaque changement de projet).
+  useEffect(() => {
+    if (project) setProjectName(project.name);
+  }, [project]);
 
   const selectedRepo = repos?.find((r) => r.fullName === selectedRepoFullName);
 
@@ -115,9 +125,30 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     }
   };
 
-  // Pas de backend branché pour ces sections : ces soumissions ne persistent rien réellement.
-  const handleGeneralSubmit = (e: React.FormEvent) => {
+  const handleGeneralSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!projectName.trim()) return;
+
+    setSavingName(true);
+    setNameError(null);
+    setNameSaved(false);
+
+    try {
+      const res = await fetch(`${API_URL}/api/projects/${projectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: projectName.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
+      await refetchProjects();
+      setNameSaved(true);
+    } catch (err) {
+      setNameError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setSavingName(false);
+    }
   };
 
   const handleAddPerson = (e: React.FormEvent) => {
@@ -153,12 +184,24 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
 
       <SettingsSection title="Informations générales" description="Nom du projet.">
         <form onSubmit={handleGeneralSubmit} className="space-y-4">
-          <TextInput label="Nom du projet" id="project-name" defaultValue={project.name} />
+          <TextInput
+            label="Nom du projet"
+            id="project-name"
+            value={projectName}
+            onChange={(e) => {
+              setProjectName(e.target.value);
+              setNameSaved(false);
+              setNameError(null);
+            }}
+          />
+          {nameError && <p className="text-sm text-status-critical">{nameError}</p>}
+          {nameSaved && <p className="text-sm text-status-good">Nom du projet mis à jour.</p>}
           <button
             type="submit"
-            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
+            disabled={savingName || !projectName.trim()}
+            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Enregistrer
+            {savingName ? "Enregistrement..." : "Enregistrer"}
           </button>
         </form>
       </SettingsSection>
