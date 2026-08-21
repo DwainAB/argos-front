@@ -13,18 +13,18 @@ export type Project = {
 
 export const mockProjects: Project[] = [
   {
-    id: "guardian-api",
-    name: "Guardian API",
+    id: "argos-api",
+    name: "Argos API",
     status: "good",
-    githubRepo: "DwainAB/guardian-back",
+    githubRepo: "DwainAB/argos-back",
     githubBranch: "main",
     lastDeployAt: "Il y a 12 minutes",
   },
   {
-    id: "guardian-front",
-    name: "Guardian Front",
+    id: "argos-front",
+    name: "Argos Front",
     status: "warning",
-    githubRepo: "DwainAB/guardian-front",
+    githubRepo: "DwainAB/argos-front",
     githubBranch: "main",
     lastDeployAt: "Il y a 1 heure",
   },
@@ -58,16 +58,16 @@ export const mockNotifications: NotificationItem[] = [
   },
   {
     id: "n2",
-    projectId: "guardian-front",
-    projectName: "Guardian Front",
+    projectId: "argos-front",
+    projectName: "Argos Front",
     level: "warning",
     message: "Temps de réponse anormalement élevé sur /api/logs.",
     time: "Il y a 45 minutes",
   },
   {
     id: "n3",
-    projectId: "guardian-api",
-    projectName: "Guardian API",
+    projectId: "argos-api",
+    projectName: "Argos API",
     level: "info",
     message: "Déploiement réussi sur la branche main.",
     time: "Il y a 12 minutes",
@@ -130,7 +130,7 @@ export const mockLogs: LogEntry[] = [
   },
   {
     id: "l3",
-    projectId: "guardian-front",
+    projectId: "argos-front",
     level: "warning",
     source: "api",
     rawMessage: "GET /api/logs 200 OK — 1850ms (threshold: 1000ms)",
@@ -140,7 +140,7 @@ export const mockLogs: LogEntry[] = [
   },
   {
     id: "l4",
-    projectId: "guardian-api",
+    projectId: "argos-api",
     level: "info",
     source: "deploy",
     rawMessage: "Deployment succeeded — commit 4c9fa86 on branch main",
@@ -150,7 +150,7 @@ export const mockLogs: LogEntry[] = [
   },
   {
     id: "l5",
-    projectId: "guardian-api",
+    projectId: "argos-api",
     level: "info",
     source: "api",
     rawMessage: "GET /health 200 OK — 42ms",
@@ -187,7 +187,7 @@ export const mockAlerts: Alert[] = [
   },
   {
     id: "a2",
-    projectId: "guardian-front",
+    projectId: "argos-front",
     level: "warning",
     title: "Temps de réponse élevé",
     message: "GET /api/logs 200 OK — 1850ms (seuil: 1000ms)",
