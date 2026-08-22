@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/config";
 import { CategoryBadge, categoryLabels, type LogCategory } from "@/components/dashboard/CategoryBadge";
+import { TriageStatusBadge } from "@/components/dashboard/TriageStatusBadge";
 import { SidePanel } from "@/components/dashboard/SidePanel";
 
 type ApiLogEntry = {
@@ -11,6 +12,7 @@ type ApiLogEntry = {
   level: string;
   category: string;
   originalCategory: string | null;
+  triageStatus: string;
   source: string;
   aiSummary: string | null;
   createdAt: string;
@@ -133,6 +135,7 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
                   className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm transition hover:bg-surface-border/5"
                 >
                   <CategoryBadge category={log.category} />
+                  <TriageStatusBadge status={log.triageStatus} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-mono text-xs text-ink-primary">{log.rawMessage}</p>
                     <p className="mt-1 text-xs text-ink-muted">
@@ -153,8 +156,9 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
         {selectedLog && (
           <div className="space-y-5">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <CategoryBadge category={selectedLog.category} />
+                <TriageStatusBadge status={selectedLog.triageStatus} />
                 <span className="text-xs text-ink-muted">
                   {selectedLog.source} · {selectedLog.level} · {new Date(selectedLog.createdAt).toLocaleString("fr-FR")}
                 </span>
