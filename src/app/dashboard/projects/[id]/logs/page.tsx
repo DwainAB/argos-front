@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/config";
-import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
+import { CategoryBadge, categoryLabels, type LogCategory } from "@/components/dashboard/CategoryBadge";
 import { SidePanel } from "@/components/dashboard/SidePanel";
 
 type ApiLogEntry = {
@@ -10,10 +10,20 @@ type ApiLogEntry = {
   rawMessage: string;
   level: string;
   category: string;
+  originalCategory: string | null;
   source: string;
   aiSummary: string | null;
   createdAt: string;
 };
+
+// Libellé "reclassifié par l'IA" affiché sous un log dont la catégorie initiale (posée par
+// les règles) a été corrigée par le triage IA local — voir originalCategory côté backend.
+function reclassifiedLabel(log: ApiLogEntry): string | null {
+  if (!log.originalCategory) return null;
+  const from = categoryLabels[log.originalCategory as LogCategory] ?? log.originalCategory;
+  const to = categoryLabels[log.category as LogCategory] ?? log.category;
+  return `Reclassifié par l'IA après vérification : ${from} → ${to}`;
+}
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -128,6 +138,9 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
                     <p className="mt-1 text-xs text-ink-muted">
                       {log.source} · {log.level} · {new Date(log.createdAt).toLocaleString("fr-FR")}
                     </p>
+                    {reclassifiedLabel(log) && (
+                      <p className="mt-1 text-xs italic text-accent-400">{reclassifiedLabel(log)}</p>
+                    )}
                   </div>
                 </button>
               </li>
@@ -139,11 +152,16 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
       <SidePanel open={selectedLog !== null} onClose={() => setSelectedLog(null)} title="Détail du log">
         {selectedLog && (
           <div className="space-y-5">
-            <div className="flex items-center gap-2">
-              <CategoryBadge category={selectedLog.category} />
-              <span className="text-xs text-ink-muted">
-                {selectedLog.source} · {selectedLog.level} · {new Date(selectedLog.createdAt).toLocaleString("fr-FR")}
-              </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <CategoryBadge category={selectedLog.category} />
+                <span className="text-xs text-ink-muted">
+                  {selectedLog.source} · {selectedLog.level} · {new Date(selectedLog.createdAt).toLocaleString("fr-FR")}
+                </span>
+              </div>
+              {reclassifiedLabel(selectedLog) && (
+                <p className="mt-1 text-xs italic text-accent-400">{reclassifiedLabel(selectedLog)}</p>
+              )}
             </div>
 
             <div>
