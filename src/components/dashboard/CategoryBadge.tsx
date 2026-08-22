@@ -1,6 +1,6 @@
 export type LogCategory = "critical" | "warning" | "benign" | "info";
 
-const categoryLabels: Record<LogCategory, string> = {
+export const categoryLabels: Record<LogCategory, string> = {
   critical: "Critique",
   warning: "Avertissement",
   benign: "Erreur bénigne",
