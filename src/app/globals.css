@@ -27,3 +27,48 @@
     @apply bg-surface text-ink-primary transition-colors duration-150;
   }
 }
+
+@layer utilities {
+  /* Curseur clignotant du terminal du hero. */
+  @keyframes caret-blink {
+    0%,
+    45% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+  .animate-caret {
+    animation: caret-blink 1s step-end infinite;
+  }
+
+  /* Apparition progressive des lignes de log dans le terminal du hero. */
+  @keyframes line-in {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-line-in {
+    animation: line-in 0.4s ease-out both;
+  }
+
+  /* Pastille "live" qui pulse. */
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 rgb(var(--pulse-color, 59 130 246) / 0.55);
+    }
+    100% {
+      box-shadow: 0 0 0 8px rgb(var(--pulse-color, 59 130 246) / 0);
+    }
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 1.8s ease-out infinite;
+  }
+}

@@ -76,11 +76,11 @@ export function NewProjectContent() {
         </p>
       </div>
 
-      <SettingsSection title="Nom du projet" description="Comment voulez-vous appeler ce projet dans Guardian AI ?">
+      <SettingsSection title="Nom du projet" description="Comment voulez-vous appeler ce projet dans Argos AI ?">
         <TextInput
           label="Nom du projet"
           id="project-name"
-          placeholder="ex: Guardian API"
+          placeholder="ex: Argos API"
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
           disabled={!!createdProjectId}
