@@ -1,2 +1,2 @@
-// URL de base de l'API backend Guardian AI.
+// URL de base de l'API backend Argos AI.
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";

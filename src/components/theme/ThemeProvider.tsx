@@ -11,7 +11,7 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const STORAGE_KEY = "guardian-ai-theme";
+const STORAGE_KEY = "argos-ai-theme";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   // Dark par défaut ; la valeur réelle est resynchronisée au montage via le localStorage.

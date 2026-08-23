@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Palette de marque Guardian AI — accent bleu électrique/azur, dark par défaut.
+// Palette de marque Argos AI — accent bleu électrique/azur, dark par défaut.
 const config: Config = {
   darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],

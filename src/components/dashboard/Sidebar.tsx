@@ -111,7 +111,7 @@ export function Sidebar() {
                   />
                 </svg>
               </span>
-              <span className="whitespace-nowrap text-sm font-semibold text-ink-primary">Guardian AI</span>
+              <span className="whitespace-nowrap text-sm font-semibold text-ink-primary">Argos AI</span>
             </Link>
 
             <button

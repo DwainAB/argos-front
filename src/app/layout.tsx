@@ -3,7 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export const metadata = {
-  title: "Guardian AI",
+  title: "Argos AI",
   description: "Surveillance de logs et détection d'anomalies assistée par IA",
 };
 
@@ -11,7 +11,7 @@ export const metadata = {
 const themeInitScript = `
 (function () {
   try {
-    var stored = window.localStorage.getItem("guardian-ai-theme");
+    var stored = window.localStorage.getItem("argos-ai-theme");
     var theme = stored === "light" ? "light" : "dark";
     document.documentElement.classList.toggle("dark", theme === "dark");
   } catch (e) {}

@@ -31,7 +31,7 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-ink-primary">Guardian AI</h1>
+          <h1 className="text-xl font-semibold text-ink-primary">Argos AI</h1>
           <p className="mt-1 text-sm text-ink-secondary">
             Connectez-vous pour surveiller vos projets
           </p>
