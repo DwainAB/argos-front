@@ -134,8 +134,8 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
                   }}
                   className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm transition hover:bg-surface-border/5"
                 >
-                  <CategoryBadge category={log.category} />
                   <TriageStatusBadge status={log.triageStatus} />
+                  <CategoryBadge category={log.category} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-mono text-xs text-ink-primary">{log.rawMessage}</p>
                     <p className="mt-1 text-xs text-ink-muted">

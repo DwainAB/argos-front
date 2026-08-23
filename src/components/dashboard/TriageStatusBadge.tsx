@@ -13,11 +13,12 @@ export function TriageStatusBadge({ status }: { status: string }) {
 
   if (status === "checking") {
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent-500/10 px-2 py-0.5 text-xs font-medium text-accent-400">
-        <span aria-hidden="true" className="animate-pulse">
-          👁️
-        </span>
-        Vérification IA en cours...
+      <span
+        aria-hidden="true"
+        title="Vérification IA en cours..."
+        className="inline-flex shrink-0 animate-pulse items-center"
+      >
+        👁️
       </span>
     );
   }
