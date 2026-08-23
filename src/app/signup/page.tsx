@@ -7,10 +7,10 @@ import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { GithubIcon } from "@/components/icons/GithubIcon";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
 
-  // Pour l'instant, aucune vérification réelle : on redirige simplement vers le dashboard.
+  // Pour l'instant, aucune création réelle de compte : on redirige simplement vers le dashboard.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     router.push("/dashboard");
@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
-      {/* Décor de fond, cohérent avec la landing page. */}
+      {/* Décor de fond, cohérent avec la landing page et le login. */}
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
         <div
           className="absolute inset-0"
@@ -40,12 +40,26 @@ export default function LoginPage() {
           </span>
           <h1 className="text-xl font-semibold text-ink-primary">Argos AI</h1>
           <p className="mt-1 text-sm text-ink-secondary">
-            Connectez-vous pour surveiller vos projets
+            Créez votre compte pour surveiller vos projets
           </p>
         </Link>
 
         <div className="rounded-xl border border-surface-border/10 bg-surface-raised/90 p-6 shadow-2xl shadow-accent-500/5 backdrop-blur">
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="mb-1 block text-sm text-ink-secondary">
+                Nom complet
+              </label>
+              <input
+                id="name"
+                type="text"
+                required
+                placeholder="Jane Dupont"
+                autoComplete="name"
+                className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none transition focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
+              />
+            </div>
+
             <div>
               <label htmlFor="email" className="mb-1 block text-sm text-ink-secondary">
                 Email
@@ -55,33 +69,32 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="vous@exemple.com"
+                autoComplete="email"
                 className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none transition focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
               />
             </div>
 
             <div>
-              <div className="mb-1 flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm text-ink-secondary">
-                  Mot de passe
-                </label>
-                <a href="#" className="text-xs text-accent-400 hover:text-accent-300">
-                  Mot de passe oublié ?
-                </a>
-              </div>
+              <label htmlFor="password" className="mb-1 block text-sm text-ink-secondary">
+                Mot de passe
+              </label>
               <input
                 id="password"
                 type="password"
                 required
+                minLength={8}
                 placeholder="••••••••"
+                autoComplete="new-password"
                 className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none transition focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
               />
+              <p className="mt-1.5 text-xs text-ink-muted">8 caractères minimum.</p>
             </div>
 
             <button
               type="submit"
               className="w-full rounded-lg bg-accent-500 py-2 text-sm font-medium text-surface shadow-lg shadow-accent-500/20 transition hover:bg-accent-400 hover:shadow-accent-500/30"
             >
-              Connexion
+              Créer mon compte
             </button>
           </form>
 
@@ -113,9 +126,9 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-sm text-ink-secondary">
-          Pas encore de compte ?{" "}
-          <Link href="/signup" className="text-accent-400 hover:text-accent-300">
-            Créer un compte
+          Déjà un compte ?{" "}
+          <Link href="/login" className="text-accent-400 hover:text-accent-300">
+            Se connecter
           </Link>
         </p>
       </div>
