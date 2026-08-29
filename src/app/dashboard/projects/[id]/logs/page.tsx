@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { CategoryBadge, categoryLabels, type LogCategory } from "@/components/dashboard/CategoryBadge";
 import { TriageStatusBadge } from "@/components/dashboard/TriageStatusBadge";
 import { SidePanel } from "@/components/dashboard/SidePanel";
@@ -46,7 +46,7 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
     setExplainError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/logs/${log.id}/explain`, { method: "POST" });
+      const res = await apiFetch(`/api/logs/${log.id}/explain`, { method: "POST" });
       if (!res.ok) throw new Error("Réponse non OK");
 
       const contentType = res.headers.get("content-type") ?? "";
@@ -87,7 +87,7 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
 
     async function fetchLogs() {
       try {
-        const res = await fetch(`${API_URL}/api/projects/${params.id}/logs`);
+        const res = await apiFetch(`/api/projects/${params.id}/logs`);
         const data = await res.json();
         if (!cancelled) setLogs(data.logs ?? []);
       } catch (err) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
 
 type ApiAlert = {
@@ -33,8 +33,8 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
 
     async function fetchAlerts() {
       try {
-        const res = await fetch(
-          `${API_URL}/api/projects/${params.id}/alerts?resolved=${showHistory ? "true" : "false"}`
+        const res = await apiFetch(
+          `/api/projects/${params.id}/alerts?resolved=${showHistory ? "true" : "false"}`
         );
         const data = await res.json();
         if (!cancelled) setAlerts(data.alerts ?? []);

@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { mockProjects, mockNotifications, statusDotClasses, statusLabels } from "@/lib/mock-data";
 import { StatCard } from "@/components/dashboard/StatCard";
+import { useCurrentUser } from "@/components/dashboard/UserContext";
 
 const levelClasses = {
   info: "text-status-good",
@@ -8,14 +11,23 @@ const levelClasses = {
   error: "text-status-critical",
 } as const;
 
+// Salutation selon l'heure locale du visiteur au moment de l'affichage.
+function greeting() {
+  const hour = new Date().getHours();
+  return hour >= 18 || hour < 6 ? "Bonsoir" : "Bonjour";
+}
+
 export default function DashboardOverviewPage() {
+  const user = useCurrentUser();
   const criticalCount = mockProjects.filter((p) => p.status === "critical").length;
   const warningCount = mockProjects.filter((p) => p.status === "warning").length;
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold text-ink-primary">Vue d'ensemble</h1>
+        <h1 className="text-xl font-semibold text-ink-primary">
+          {greeting()}, {user.firstName}
+        </h1>
         <p className="mt-1 text-sm text-ink-secondary">
           Récapitulatif de tous vos projets connectés.
         </p>

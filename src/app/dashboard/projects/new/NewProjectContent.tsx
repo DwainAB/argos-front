@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { Modal } from "@/components/dashboard/Modal";
@@ -49,7 +50,7 @@ export function NewProjectContent() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/integrations/railway/connect-with-token`, {
+      const res = await apiFetch(`/api/integrations/railway/connect-with-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectName, projectToken, serviceId, environmentId }),
@@ -222,7 +223,7 @@ function GithubRepoPicker({
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/integrations/github/repos?installationId=${installationId}`)
+    apiFetch(`/api/integrations/github/repos?installationId=${installationId}`)
       .then(async (res) => {
         if (!res.ok) throw new Error((await res.json()).error ?? "Erreur inconnue");
         return res.json();
@@ -241,7 +242,7 @@ function GithubRepoPicker({
     setLoadingBranches(true);
     setBranches([]);
 
-    fetch(`${API_URL}/api/integrations/github/branches?installationId=${installationId}&owner=${owner}&repo=${repo}`)
+    apiFetch(`/api/integrations/github/branches?installationId=${installationId}&owner=${owner}&repo=${repo}`)
       .then((res) => res.json())
       .then((data) => {
         setBranches(data.branches ?? []);
@@ -258,7 +259,7 @@ function GithubRepoPicker({
     setSaveError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/projects/${projectId}/github`, {
+      const res = await apiFetch(`/api/projects/${projectId}/github`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ installationId, repoFullName: selectedRepoFullName, branch: selectedBranch }),

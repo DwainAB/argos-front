@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSidebar } from "./SidebarContext";
-import { API_URL } from "@/lib/config";
+import { useCurrentUser } from "./UserContext";
+import { Modal } from "./Modal";
+import { apiFetch } from "@/lib/api-fetch";
+import { logout } from "@/lib/auth";
 import {
   IconOverview,
   IconProjects,
@@ -14,6 +17,7 @@ import {
   IconIntegrations,
   IconChevronLeft,
   IconChevronRight,
+  IconLogout,
 } from "@/components/icons/NavIcons";
 
 type NavItem = {
@@ -46,13 +50,21 @@ function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
 }
 
 export function Sidebar() {
+  const router = useRouter();
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebar();
+  const user = useCurrentUser();
 
   const projectMatch = pathname.match(/^\/dashboard\/projects\/([^/]+)/);
   const activeProjectId = projectMatch?.[1];
 
   const [alertsCount, setAlertsCount] = useState(0);
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
 
   useEffect(() => {
     if (!activeProjectId) return;
@@ -61,7 +73,7 @@ export function Sidebar() {
 
     async function fetchAlertsCount() {
       try {
-        const res = await fetch(`${API_URL}/api/projects/${activeProjectId}/alerts`);
+        const res = await apiFetch(`/api/projects/${activeProjectId}/alerts`);
         const data = await res.json();
         if (cancelled) return;
         const alerts: unknown[] = data.alerts ?? [];
@@ -164,6 +176,61 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <div className={`border-t border-surface-border/10 p-3 ${collapsed ? "flex justify-center" : ""}`}>
+        {collapsed ? (
+          <button
+            type="button"
+            onClick={() => setConfirmingLogout(true)}
+            title="Déconnexion"
+            aria-label="Déconnexion"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400 transition hover:bg-status-critical/20 hover:text-status-critical"
+          >
+            {user.firstName.charAt(0).toUpperCase()}
+          </button>
+        ) : (
+          <div className="flex items-center gap-2.5 rounded-lg px-1 py-1">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-sm text-accent-400">
+              {user.firstName.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-ink-primary">
+                {user.firstName} {user.lastName}
+              </p>
+              <p className="truncate text-xs text-ink-muted">{user.email}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setConfirmingLogout(true)}
+              title="Déconnexion"
+              aria-label="Déconnexion"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-ink-secondary transition hover:bg-status-critical/10 hover:text-status-critical"
+            >
+              <IconLogout className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <Modal open={confirmingLogout} onClose={() => setConfirmingLogout(false)} title="Confirmer la déconnexion">
+        <p className="text-sm text-ink-secondary">Voulez-vous vraiment vous déconnecter ?</p>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setConfirmingLogout(false)}
+            className="rounded-lg border border-surface-border/10 bg-surface px-4 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-lg bg-status-critical px-4 py-2 text-sm font-medium text-white transition hover:bg-status-critical/90"
+          >
+            Se déconnecter
+          </button>
+        </div>
+      </Modal>
     </aside>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
@@ -61,7 +62,7 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     setLoadingRepos(true);
     setReposError(null);
 
-    fetch(`${API_URL}/api/integrations/github/repos?installationId=${githubInstallationId}`)
+    apiFetch(`/api/integrations/github/repos?installationId=${githubInstallationId}`)
       .then(async (res) => {
         if (!res.ok) throw new Error((await res.json()).error ?? "Erreur inconnue");
         return res.json();
@@ -86,8 +87,8 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     setLoadingBranches(true);
     setBranches([]);
 
-    fetch(
-      `${API_URL}/api/integrations/github/branches?installationId=${githubInstallationId}&owner=${owner}&repo=${repo}`
+    apiFetch(
+      `/api/integrations/github/branches?installationId=${githubInstallationId}&owner=${owner}&repo=${repo}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -105,7 +106,7 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     setSaveError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/projects/${projectId}/github`, {
+      const res = await apiFetch(`/api/projects/${projectId}/github`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -134,7 +135,7 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     setNameSaved(false);
 
     try {
-      const res = await fetch(`${API_URL}/api/projects/${projectId}`, {
+      const res = await apiFetch(`/api/projects/${projectId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: projectName.trim() }),
