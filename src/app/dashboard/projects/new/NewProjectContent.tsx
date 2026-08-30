@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { API_URL } from "@/lib/config";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api-fetch";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { Modal } from "@/components/dashboard/Modal";
+import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton";
 
 type GithubRepo = {
   id: number;
@@ -15,15 +15,11 @@ type GithubRepo = {
   defaultBranch: string;
 };
 
-const RETURN_PATH = "/dashboard/projects/new";
-
 export function NewProjectContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const githubInstallationId = searchParams.get("github_installation_id");
-  const githubProjectIdFromReturn = searchParams.get("github_project_id");
-  const githubError = searchParams.get("github_error");
+  const [githubInstallationId, setGithubInstallationId] = useState<string | null>(null);
+  const [githubError, setGithubError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -36,9 +32,8 @@ export function NewProjectContent() {
   const [error, setError] = useState<string | null>(null);
 
   // Une fois Railway connecté, le projet existe en base : on garde son id pour la suite
-  // (bouton GitHub, redirection finale). Restauré depuis l'URL si on revient d'un callback
-  // GitHub (le projet a été créé avant la redirection vers l'installation GitHub).
-  const [createdProjectId, setCreatedProjectId] = useState<string | null>(githubProjectIdFromReturn);
+  // (bouton GitHub, redirection finale).
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const [githubRepo, setGithubRepo] = useState<string | null>(null);
   const [githubBranch, setGithubBranch] = useState<string | null>(null);
 
@@ -109,22 +104,32 @@ export function NewProjectContent() {
             {createdProjectId ? "Railway connecté ✓" : "Connecter Railway"}
           </button>
 
-          <a
-            href={
-              createdProjectId
-                ? `${API_URL}/api/integrations/github/start?projectId=${createdProjectId}&returnPath=${encodeURIComponent(RETURN_PATH)}`
-                : undefined
-            }
-            aria-disabled={!createdProjectId}
-            title={!createdProjectId ? "Connectez d'abord Railway" : undefined}
-            className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition ${
-              createdProjectId
-                ? "border-surface-border/10 text-ink-primary hover:bg-surface-border/5"
-                : "cursor-not-allowed border-surface-border/10 text-ink-muted opacity-50"
-            }`}
-          >
-            {githubRepo ? `GitHub connecté ✓ (${githubRepo})` : "Connecter GitHub"}
-          </a>
+          {createdProjectId ? (
+            <GithubConnectButton
+              projectId={createdProjectId}
+              disabled={!!githubRepo}
+              onResult={(result) => {
+                if ("error" in result) {
+                  setGithubError(result.error);
+                } else {
+                  setGithubError(null);
+                  setGithubInstallationId(result.installationId);
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-surface-border/10 px-4 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {githubRepo ? `GitHub connecté ✓ (${githubRepo})` : "Connecter GitHub"}
+            </GithubConnectButton>
+          ) : (
+            <button
+              type="button"
+              disabled
+              title="Connectez d'abord Railway"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-surface-border/10 px-4 py-2 text-sm font-medium text-ink-muted opacity-50"
+            >
+              Connecter GitHub
+            </button>
+          )}
         </div>
 
         {createdProjectId && githubInstallationId && !githubRepo && (

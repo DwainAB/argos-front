@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { API_URL } from "@/lib/config";
 import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
+import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton";
 import { IconPlus } from "@/components/icons/NavIcons";
 
 type NotifiedPerson = {
@@ -23,9 +22,8 @@ type GithubRepo = {
 };
 
 export function ProjectSettingsContent({ projectId }: { projectId: string }) {
-  const searchParams = useSearchParams();
-  const githubInstallationId = searchParams.get("github_installation_id");
-  const githubError = searchParams.get("github_error");
+  const [githubInstallationId, setGithubInstallationId] = useState<string | null>(null);
+  const [githubError, setGithubError] = useState<string | null>(null);
 
   const { projects, loading: projectsLoading, refetch: refetchProjects } = useProjects();
   const project = projects.find((p) => p.id === projectId);
@@ -223,12 +221,20 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
             <span className="font-mono">{project.githubBranch}</span>).
           </p>
         ) : !githubInstallationId ? (
-          <a
-            href={`${API_URL}/api/integrations/github/start?projectId=${projectId}`}
+          <GithubConnectButton
+            projectId={projectId}
+            onResult={(result) => {
+              if ("error" in result) {
+                setGithubError(result.error);
+              } else {
+                setGithubError(null);
+                setGithubInstallationId(result.installationId);
+              }
+            }}
             className="inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
           >
             Connecter GitHub
-          </a>
+          </GithubConnectButton>
         ) : (
           <div className="space-y-4">
             {loadingRepos && <p className="text-sm text-ink-secondary">Chargement des dépôts...</p>}
