@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBanner } from "@/components/dashboard/StatusBanner";
@@ -30,7 +30,7 @@ export default function ProjectOverviewPage({ params }: { params: { id: string }
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`${API_URL}/api/projects/${params.id}/overview`)
+    apiFetch(`/api/projects/${params.id}/overview`)
       .then((res) => res.json())
       .then((data) => {
         if (!cancelled) setOverview(data);

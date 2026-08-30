@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
 
 type ApiAlert = {
@@ -40,7 +40,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
 
     async function fetchAlert() {
       try {
-        const res = await fetch(`${API_URL}/api/alerts/${params.alertId}`);
+        const res = await apiFetch(`/api/alerts/${params.alertId}`);
         if (!res.ok) throw new Error("Réponse non OK");
         const data = await res.json();
         if (!cancelled) setAlert(data.alert);
@@ -64,7 +64,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     setFixError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/alerts/${alert.id}/fix/request`, { method: "POST" });
+      const res = await apiFetch(`/api/alerts/${alert.id}/fix/request`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
       setAlert(data.alert);
@@ -86,7 +86,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     const action = alert.resolvedAt ? "reopen" : "resolve";
 
     try {
-      const res = await fetch(`${API_URL}/api/alerts/${alert.id}/${action}`, { method: "POST" });
+      const res = await apiFetch(`/api/alerts/${alert.id}/${action}`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
       setAlert(data.alert);
@@ -104,7 +104,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     setFixError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/alerts/${alert.id}/fix/${decision}`, { method: "POST" });
+      const res = await apiFetch(`/api/alerts/${alert.id}/fix/${decision}`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
       setAlert(data.alert);

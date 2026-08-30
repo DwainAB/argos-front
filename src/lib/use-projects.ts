@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_URL } from "./config";
+import { apiFetch } from "./api-fetch";
 
 export type ApiProject = {
   id: string;
@@ -20,7 +20,7 @@ export function useProjects() {
   const [loading, setLoading] = useState(true);
 
   const refetch = () => {
-    return fetch(`${API_URL}/api/projects`)
+    return apiFetch("/api/projects")
       .then((res) => res.json())
       .then((data) => {
         setProjects(data.projects ?? []);
@@ -31,7 +31,7 @@ export function useProjects() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`${API_URL}/api/projects`)
+    apiFetch("/api/projects")
       .then((res) => res.json())
       .then((data) => {
         if (!cancelled) setProjects(data.projects ?? []);

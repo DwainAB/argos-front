@@ -1,21 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/icons/Logo";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { GithubIcon } from "@/components/icons/GithubIcon";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
+import { ApiAuthError, login } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  // Pour l'instant, aucune vérification réelle : on redirige simplement vers le dashboard.
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/dashboard");
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await login({ email, password });
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof ApiAuthError ? err.message : "Impossible de vous connecter.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  // Connexion Google/GitHub à venir — pas encore branchée sur une vraie authentification.
   const handleOAuthClick = () => {
     router.push("/dashboard");
   };
@@ -55,6 +72,9 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="vous@exemple.com"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none transition focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
               />
             </div>
@@ -73,15 +93,21 @@ export default function LoginPage() {
                 type="password"
                 required
                 placeholder="••••••••"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-sm text-ink-primary placeholder:text-ink-muted outline-none transition focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
               />
             </div>
 
+            {error && <p className="text-sm text-status-critical">{error}</p>}
+
             <button
               type="submit"
-              className="w-full rounded-lg bg-accent-500 py-2 text-sm font-medium text-surface shadow-lg shadow-accent-500/20 transition hover:bg-accent-400 hover:shadow-accent-500/30"
+              disabled={submitting}
+              className="w-full rounded-lg bg-accent-500 py-2 text-sm font-medium text-surface shadow-lg shadow-accent-500/20 transition hover:bg-accent-400 hover:shadow-accent-500/30 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Connexion
+              {submitting ? "Connexion..." : "Connexion"}
             </button>
           </form>
 
