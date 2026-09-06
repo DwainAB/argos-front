@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
+import { useCurrentUser } from "@/components/dashboard/UserContext";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton";
+import { ProjectSharesSection } from "@/components/dashboard/ProjectSharesSection";
+import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 import { IconPlus } from "@/components/icons/NavIcons";
 
 type NotifiedPerson = {
@@ -22,6 +25,7 @@ type GithubRepo = {
 };
 
 export function ProjectSettingsContent({ projectId }: { projectId: string }) {
+  const currentUser = useCurrentUser();
   const [githubInstallationId, setGithubInstallationId] = useState<string | null>(null);
   const [githubError, setGithubError] = useState<string | null>(null);
 
@@ -177,7 +181,10 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-ink-primary">Paramètres du projet</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-xl font-semibold text-ink-primary">Paramètres du projet</h1>
+          <ProjectOwnerBadge project={project} />
+        </div>
         <p className="mt-1 text-sm text-ink-secondary">Configuration de {project.name}.</p>
       </div>
 
@@ -298,6 +305,8 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
           </div>
         )}
       </SettingsSection>
+
+      {currentUser.accountType === "organization" && <ProjectSharesSection projectId={projectId} />}
 
       <SettingsSection
         title="Personnes à notifier"

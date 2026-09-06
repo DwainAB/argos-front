@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api-fetch";
+import { useProjects } from "@/lib/use-projects";
 import { CategoryBadge, categoryLabels, type LogCategory } from "@/components/dashboard/CategoryBadge";
 import { TriageStatusBadge } from "@/components/dashboard/TriageStatusBadge";
 import { SidePanel } from "@/components/dashboard/SidePanel";
+import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 
 type ApiLogEntry = {
   id: string;
@@ -30,6 +32,9 @@ function reclassifiedLabel(log: ApiLogEntry): string | null {
 const POLL_INTERVAL_MS = 5000;
 
 export default function ProjectLogsPage({ params }: { params: { id: string } }) {
+  const { projects } = useProjects();
+  const project = projects.find((p) => p.id === params.id);
+
   const [logs, setLogs] = useState<ApiLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLog, setSelectedLog] = useState<ApiLogEntry | null>(null);
@@ -109,7 +114,10 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-ink-primary">Logs</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-xl font-semibold text-ink-primary">Logs</h1>
+          {project && <ProjectOwnerBadge project={project} />}
+        </div>
         <p className="mt-1 text-sm text-ink-secondary">
           Flux des événements bruts reçus en temps réel. Cliquez sur un log pour plus de détails.
         </p>
