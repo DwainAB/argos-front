@@ -9,7 +9,6 @@ export default function AccountSettingsPage() {
   const [language, setLanguage] = useState("fr");
   const [phone, setPhone] = useState("");
 
-  // Pas de backend branché pour l'instant : ces soumissions ne persistent rien.
   const handleLanguageSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };

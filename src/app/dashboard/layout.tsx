@@ -13,10 +13,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<CurrentUser | null>(null);
 
-  // Vérifie la session au montage : redirige vers /login si non connecté. Le contenu du
-  // dashboard n'est rendu qu'une fois la session confirmée valide, pour éviter un flash
-  // de contenu protégé avant la redirection. L'utilisateur récupéré ici est aussi
-  // exposé au reste de l'arborescence via UserProvider (Sidebar, Header, pages...).
   useEffect(() => {
     let cancelled = false;
 

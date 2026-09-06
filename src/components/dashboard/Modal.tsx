@@ -11,7 +11,6 @@ type ModalProps = {
 };
 
 export function Modal({ open, onClose, title, children }: ModalProps) {
-  // Ferme la modal avec la touche Échap.
   useEffect(() => {
     if (!open) return;
     function handleKey(e: KeyboardEvent) {

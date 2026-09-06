@@ -1,5 +1,3 @@
-// Icônes simples et légères pour la navigation, en SVG inline (pas de dépendance externe).
-
 type IconProps = { className?: string };
 
 export function IconOverview({ className }: IconProps) {

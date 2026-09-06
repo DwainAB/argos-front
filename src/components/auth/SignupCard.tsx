@@ -3,8 +3,6 @@ import Link from "next/link";
 import { Logo } from "@/components/icons/Logo";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
 
-// Décor commun aux écrans d'inscription (choix du type de compte, puis chacun des deux
-// formulaires) : fond, logo, titre, lien "déjà un compte ?".
 export function SignupCard({ subtitle, children }: { subtitle: string; children: ReactNode }) {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">

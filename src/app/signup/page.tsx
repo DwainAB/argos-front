@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { SignupCard } from "@/components/auth/SignupCard";
 
-// Le type de compte (personnel ou organisation) est choisi ici, une fois pour toutes —
-// pas de bascule possible ensuite. Chaque carte mène vers son propre formulaire.
 export default function SignupChoicePage() {
   return (
     <SignupCard subtitle="Créez votre compte pour surveiller vos projets">

@@ -13,8 +13,6 @@ export type CurrentUser = {
   createdAt: string;
 };
 
-// Erreur portant le message renvoyé par le backend (ex: "Email déjà utilisé"), pour
-// affichage direct dans le formulaire concerné.
 export class ApiAuthError extends Error {}
 
 async function parseJsonOrThrow(res: Response) {
@@ -56,8 +54,6 @@ export async function logout() {
   await apiFetch("/api/auth/logout", { method: "POST" });
 }
 
-// Renvoie l'utilisateur courant, ou null si aucune session valide (401) — distinct d'une
-// erreur réseau, qui est propagée à l'appelant.
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const res = await apiFetch("/api/auth/me");
 

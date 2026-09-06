@@ -8,8 +8,6 @@ type LogLine = {
   message: string;
 };
 
-// Séquence de logs rejouée en boucle pour illustrer la surveillance en direct.
-// Le dernier événement montre Argos AI qui traduit une erreur brute en langage clair.
 const SEQUENCE: LogLine[] = [
   { time: "03:14:02", tag: "INFO", message: "api-production — déploiement terminé" },
   { time: "03:14:07", tag: "INFO", message: "Healthcheck OK — tous les services répondent" },

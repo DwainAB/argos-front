@@ -12,8 +12,6 @@ type ProjectShare = {
   createdAt: string;
 };
 
-// Section "paramètres du projet" réservée aux comptes organisation : partage d'un projet
-// précis avec un compte personnel, par email — pas une adhésion à toute l'organisation.
 export function ProjectSharesSection({ projectId }: { projectId: string }) {
   const [shares, setShares] = useState<ProjectShare[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +37,7 @@ export function ProjectSharesSection({ projectId }: { projectId: string }) {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [projectId]);
 
   const handleShare = async (e: React.FormEvent) => {

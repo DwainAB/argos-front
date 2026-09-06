@@ -1,5 +1,3 @@
-// Icônes utilisées sur la landing page, en SVG inline (pas de dépendance externe).
-
 type IconProps = { className?: string };
 
 export function IconRadar({ className }: IconProps) {

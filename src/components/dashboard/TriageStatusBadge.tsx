@@ -1,6 +1,3 @@
-// Badge indiquant où en est le triage automatique par l'IA locale sur un log
-// critical/warning (voir triageStatus côté backend, log-triage.service.ts). N'affiche
-// rien une fois le triage terminé ("done") ou pour un log jamais concerné ("none").
 export function TriageStatusBadge({ status }: { status: string }) {
   if (status === "pending") {
     return (
