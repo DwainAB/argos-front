@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBanner } from "@/components/dashboard/StatusBanner";
+import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 
 type ProjectOverview = {
   latestDeployment: { id: string; status: string; createdAt: string } | null;
@@ -76,7 +77,10 @@ export default function ProjectOverviewPage({ params }: { params: { id: string }
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold text-ink-primary">{project.name}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-xl font-semibold text-ink-primary">{project.name}</h1>
+          <ProjectOwnerBadge project={project} />
+        </div>
         <p className="mt-1 text-sm text-ink-secondary">
           {project.githubRepo ?? "Aucun dépôt GitHub connecté"}
           {project.githubBranch ? ` · ${project.githubBranch}` : ""}

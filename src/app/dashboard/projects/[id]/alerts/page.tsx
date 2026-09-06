@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-fetch";
+import { useProjects } from "@/lib/use-projects";
 import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
+import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 
 type ApiAlert = {
   id: string;
@@ -24,6 +26,9 @@ type ApiAlert = {
 const POLL_INTERVAL_MS = 5000;
 
 export default function ProjectAlertsPage({ params }: { params: { id: string } }) {
+  const { projects } = useProjects();
+  const project = projects.find((p) => p.id === params.id);
+
   const [alerts, setAlerts] = useState<ApiAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
@@ -59,7 +64,10 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-ink-primary">{showHistory ? "Historique des alertes" : "Alertes"}</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl font-semibold text-ink-primary">{showHistory ? "Historique des alertes" : "Alertes"}</h1>
+            {project && <ProjectOwnerBadge project={project} />}
+          </div>
           <p className="mt-1 text-sm text-ink-secondary">
             {showHistory
               ? "Alertes déjà traitées pour ce projet."

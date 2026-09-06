@@ -1,11 +1,15 @@
 import { apiFetch } from "./api-fetch";
 
+export type AccountType = "personal" | "organization";
+
 export type CurrentUser = {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   phone: string | null;
+  accountType: AccountType;
+  organizationName: string | null;
   createdAt: string;
 };
 
@@ -21,7 +25,14 @@ async function parseJsonOrThrow(res: Response) {
   return data;
 }
 
-export async function signup(input: { email: string; password: string; firstName: string; lastName: string }) {
+export async function signup(input: {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  accountType: AccountType;
+  organizationName?: string;
+}) {
   const res = await apiFetch("/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

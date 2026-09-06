@@ -11,7 +11,17 @@ export type ApiProject = {
   railwayServiceId: string | null;
   railwayEnvironmentId: string | null;
   createdAt: string;
+  // Propriétaire du projet (son créateur, pas forcément l'utilisateur courant — un projet
+  // partagé garde le compte organisation d'origine comme propriétaire). Sert à afficher
+  // à qui appartient chaque projet (section "Personnel" ou nom de l'organisation).
+  user: { accountType: "personal" | "organization"; organizationName: string | null };
 };
+
+// Libellé de section à afficher pour un projet donné : le nom de l'organisation
+// propriétaire, ou "Personnel" si son propriétaire est un compte personnel.
+export function projectOwnerLabel(project: ApiProject) {
+  return project.user.accountType === "organization" ? project.user.organizationName ?? "Organisation" : "Personnel";
+}
 
 // Récupère la liste des projets connectés depuis le backend. Utilisé par la sidebar et
 // le sélecteur de projet pour refléter les vrais projets créés par l'utilisateur.

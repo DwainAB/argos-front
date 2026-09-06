@@ -2,8 +2,27 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useProjects } from "@/lib/use-projects";
+import { useProjects, projectOwnerLabel, type ApiProject } from "@/lib/use-projects";
 import { IconChevronDown, IconPlus, IconProjects } from "@/components/icons/NavIcons";
+
+// Regroupe les projets par propriétaire (section "Personnel" en premier, puis une
+// section par organisation), pour qu'on sache toujours d'un coup d'œil à qui appartient
+// chaque projet listé.
+function groupByOwner(projects: ApiProject[]) {
+  const groups: { label: string; projects: ApiProject[] }[] = [];
+
+  for (const project of projects) {
+    const label = projectOwnerLabel(project);
+    let group = groups.find((g) => g.label === label);
+    if (!group) {
+      group = { label, projects: [] };
+      groups.push(group);
+    }
+    group.projects.push(project);
+  }
+
+  return groups.sort((a, b) => (a.label === "Personnel" ? -1 : b.label === "Personnel" ? 1 : 0));
+}
 
 export function ProjectSelect() {
   const [open, setOpen] = useState(false);
@@ -15,6 +34,8 @@ export function ProjectSelect() {
   const projectMatch = pathname.match(/^\/dashboard\/projects\/([^/]+)/);
   const activeProjectId = projectMatch?.[1];
   const activeProject = projects.find((p) => p.id === activeProjectId);
+
+  const groupedProjects = groupByOwner(projects);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -65,28 +86,37 @@ export function ProjectSelect() {
 
           <div className="my-1 h-px bg-surface-border/10" />
 
-          <ul className="max-h-64 overflow-y-auto py-1">
+          <div className="max-h-64 overflow-y-auto py-1">
             {projects.length === 0 && (
-              <li className="px-3 py-2 text-xs text-ink-muted">Aucun projet connecté pour l'instant.</li>
+              <p className="px-3 py-2 text-xs text-ink-muted">Aucun projet connecté pour l'instant.</p>
             )}
-            {projects.map((project) => (
-              <li key={project.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    router.push(`/dashboard/projects/${project.id}`);
-                  }}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-surface-border/5 ${
-                    activeProjectId === project.id ? "text-accent-400" : "text-ink-primary"
-                  }`}
-                >
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-status-good" />
-                  <span className="flex-1 truncate">{project.name}</span>
-                </button>
-              </li>
+            {groupedProjects.map((group) => (
+              <div key={group.label}>
+                <p className="px-3 pb-1 pt-2 text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                  {group.label}
+                </p>
+                <ul>
+                  {group.projects.map((project) => (
+                    <li key={project.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpen(false);
+                          router.push(`/dashboard/projects/${project.id}`);
+                        }}
+                        className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-surface-border/5 ${
+                          activeProjectId === project.id ? "text-accent-400" : "text-ink-primary"
+                        }`}
+                      >
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-status-good" />
+                        <span className="flex-1 truncate">{project.name}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
 
           <div className="my-1 h-px bg-surface-border/10" />
 

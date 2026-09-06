@@ -18,6 +18,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconLogout,
+  IconOrganization,
 } from "@/components/icons/NavIcons";
 
 type NavItem = {
@@ -33,6 +34,7 @@ const POLL_INTERVAL_MS = 5000;
 const globalNavItems: NavItem[] = [
   { label: "Vue d'ensemble", href: "/dashboard", icon: IconOverview },
   { label: "Tous les projets", href: "/dashboard/projects", icon: IconProjects },
+  { label: "Organisations", href: "/dashboard/organizations", icon: IconOrganization },
   { label: "Notifications", href: "/dashboard/notifications", icon: IconBell },
   { label: "Paramètres du compte", href: "/dashboard/settings", icon: IconSettings },
 ];
