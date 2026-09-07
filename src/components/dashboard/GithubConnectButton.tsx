@@ -21,15 +21,6 @@ type GithubConnectButtonProps = {
   className?: string;
 };
 
-// Ouvre l'installation de la GitHub App dans une fenêtre séparée plutôt que de quitter
-// Argos AI : le popup se ferme de lui-même une fois l'installation terminée (voir
-// /api/integrations/github/callback côté backend) et transmet le résultat ici via
-// postMessage, sans qu'il faille recharger la page d'origine.
-//
-// Avant d'ouvrir ce popup, propose de réutiliser une installation existante : une fois
-// l'app déjà installée sur le compte choisi, GitHub ne redirige jamais vers notre
-// callback (il dépose directement sur la page de gestion de l'installation côté GitHub),
-// donc repasser systématiquement par le popup bloque l'utilisateur dans ce cas précis.
 export function GithubConnectButton({ projectId, disabled, onResult, children, className }: GithubConnectButtonProps) {
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
@@ -123,7 +114,7 @@ export function GithubConnectButton({ projectId, disabled, onResult, children, c
                         className="flex w-full items-center gap-3 rounded-lg border border-surface-border/10 bg-surface px-3 py-2 text-left text-sm transition hover:border-accent-500/30 hover:bg-surface-border/5"
                       >
                         {installation.accountAvatarUrl && (
-                          // eslint-disable-next-line @next/next/no-img-element
+
                           <img src={installation.accountAvatarUrl} alt="" className="h-6 w-6 rounded-full" />
                         )}
                         <span className="text-ink-primary">{installation.accountLogin}</span>

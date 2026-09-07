@@ -73,7 +73,7 @@ const plans = [
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-x-clip">
-      {/* Décor de fond : circuit + glows bleus répartis sur toute la page, derrière le contenu. */}
+
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
         <div
           className="absolute inset-0"
@@ -102,7 +102,6 @@ export default function HomePage() {
         </Link>
       </header>
 
-      {/* Hero */}
       <section className="relative">
         <div className="mx-auto max-w-4xl px-6 pb-8 pt-16 text-center sm:pt-24">
           <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-surface-border/10 bg-surface-raised px-3 py-1 text-xs font-medium text-ink-secondary">
@@ -132,7 +131,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Fonctionnalités */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-2xl font-semibold text-ink-primary sm:text-3xl">
@@ -163,7 +161,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-2xl font-semibold text-ink-primary sm:text-3xl">
@@ -226,7 +223,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-2xl font-semibold text-ink-primary sm:text-3xl">
@@ -240,7 +236,6 @@ export default function HomePage() {
         <FaqSection />
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-surface-border/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-ink-muted sm:flex-row">
           <div className="flex items-center gap-2">

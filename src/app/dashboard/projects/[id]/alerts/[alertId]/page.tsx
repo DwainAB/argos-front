@@ -55,9 +55,6 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     fetchAlert();
   }, [params.alertId]);
 
-  // Déclenche la proposition de correctif par l'IA distante (exploration du repo GitHub,
-  // voir POST /api/alerts/:id/fix/request côté backend). Peut prendre plusieurs dizaines
-  // de secondes selon la complexité de l'exploration.
   async function handleRequestFix() {
     if (!alert) return;
     setRequestingFix(true);
@@ -76,8 +73,6 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     }
   }
 
-  // Marque/démarque l'alerte comme traitée (voir POST /api/alerts/:id/resolve et /reopen
-  // côté backend). Indépendant du cycle de correction par IA.
   async function handleToggleResolved() {
     if (!alert) return;
     setTogglingResolved(true);

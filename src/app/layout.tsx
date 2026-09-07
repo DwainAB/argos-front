@@ -7,7 +7,6 @@ export const metadata = {
   description: "Surveillance de logs et détection d'anomalies assistée par IA",
 };
 
-// Applique le thème stocké avant l'hydratation React, pour éviter un flash visuel.
 const themeInitScript = `
 (function () {
   try {
@@ -19,7 +18,6 @@ const themeInitScript = `
 `;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  // Mode sombre par défaut. Le mode clair est activé via le ThemeProvider (voir composant).
   return (
     <html lang="fr" className="dark">
       <head>

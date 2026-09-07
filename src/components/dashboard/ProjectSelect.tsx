@@ -5,9 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useProjects, projectOwnerLabel, type ApiProject } from "@/lib/use-projects";
 import { IconChevronDown, IconPlus, IconProjects } from "@/components/icons/NavIcons";
 
-// Regroupe les projets par propriétaire (section "Personnel" en premier, puis une
-// section par organisation), pour qu'on sache toujours d'un coup d'œil à qui appartient
-// chaque projet listé.
 function groupByOwner(projects: ApiProject[]) {
   const groups: { label: string; projects: ApiProject[] }[] = [];
 

@@ -30,7 +30,6 @@ type NavItem = {
 
 const POLL_INTERVAL_MS = 5000;
 
-// Navigation en vue globale : aucun projet sélectionné.
 const globalNavItems: NavItem[] = [
   { label: "Vue d'ensemble", href: "/dashboard", icon: IconOverview },
   { label: "Tous les projets", href: "/dashboard/projects", icon: IconProjects },
@@ -39,7 +38,6 @@ const globalNavItems: NavItem[] = [
   { label: "Paramètres du compte", href: "/dashboard/settings", icon: IconSettings },
 ];
 
-// Navigation en vue projet : contextuelle au projet sélectionné.
 function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
   const base = `/dashboard/projects/${projectId}`;
   return [
@@ -196,8 +194,13 @@ export function Sidebar() {
               {user.firstName.charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
+              <p className="truncate text-[11px] text-ink-muted/70">
+                {user.accountType === "organization" ? "Organisation" : "Personnel"}
+              </p>
               <p className="truncate text-sm text-ink-primary">
-                {user.firstName} {user.lastName}
+                {user.accountType === "organization" && user.organizationName
+                  ? user.organizationName
+                  : `${user.firstName} ${user.lastName}`}
               </p>
               <p className="truncate text-xs text-ink-muted">{user.email}</p>
             </div>

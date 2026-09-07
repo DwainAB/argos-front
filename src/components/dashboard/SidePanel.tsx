@@ -11,7 +11,6 @@ type SidePanelProps = {
 };
 
 export function SidePanel({ open, onClose, title, children }: SidePanelProps) {
-  // Ferme le panneau avec la touche Échap.
   useEffect(() => {
     if (!open) return;
     function handleKey(e: KeyboardEvent) {

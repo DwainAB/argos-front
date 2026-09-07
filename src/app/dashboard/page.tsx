@@ -7,7 +7,6 @@ import { apiFetch } from "@/lib/api-fetch";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { useCurrentUser } from "@/components/dashboard/UserContext";
 
-// Salutation selon l'heure locale du visiteur au moment de l'affichage.
 function greeting() {
   const hour = new Date().getHours();
   return hour >= 18 || hour < 6 ? "Bonsoir" : "Bonjour";
@@ -19,9 +18,6 @@ export default function DashboardOverviewPage() {
   const user = useCurrentUser();
   const { projects, loading } = useProjects();
 
-  // Compteurs d'erreurs/avertissements (24h) par projet, pour dériver le nombre de
-  // projets critiques/en avertissement — mêmes données que la page d'aperçu d'un projet
-  // (GET /api/projects/:id/overview), agrégées ici sur tous les projets de l'utilisateur.
   const [overviews, setOverviews] = useState<Record<string, ProjectOverview>>({});
 
   useEffect(() => {
@@ -77,8 +73,7 @@ export default function DashboardOverviewPage() {
           value={loading ? "…" : String(warningCount)}
           tone={warningCount > 0 ? "warning" : "good"}
         />
-        {/* Système de notifications (SMS/email) pas encore implémenté : le compte reflète
-            honnêtement qu'aucune notification n'a encore été envoyée. */}
+
         <StatCard label="Notifications (24h)" value="0" />
       </div>
 

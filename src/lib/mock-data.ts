@@ -1,5 +1,3 @@
-// Données factices utilisées pour construire l'interface avant le branchement au backend.
-
 export type ProjectStatus = "good" | "warning" | "critical";
 
 export type Project = {
@@ -86,7 +84,6 @@ export const statusDotClasses: Record<ProjectStatus, string> = {
   critical: "bg-status-critical",
 };
 
-// Message de synthèse généré par l'IA, affiché en haut de l'aperçu du projet.
 export const statusSummaries: Record<ProjectStatus, string> = {
   good: "Votre serveur fonctionne normalement. Aucune erreur détectée depuis la dernière heure.",
   warning:

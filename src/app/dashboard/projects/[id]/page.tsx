@@ -13,7 +13,6 @@ type ProjectOverview = {
   warningCount: number;
 };
 
-// Couleur du statut de déploiement tel que renvoyé par Railway (SUCCESS, FAILED, CRASHED...).
 function deploymentStatusClass(status: string) {
   const normalized = status.toUpperCase();
   if (normalized === "SUCCESS") return "text-status-good";
@@ -87,8 +86,6 @@ export default function ProjectOverviewPage({ params }: { params: { id: string }
         </p>
       </div>
 
-      {/* Le statut global dépend de l'analyse IA des logs, pas encore implémentée côté
-          backend — affichage neutre en attendant. */}
       <StatusBanner status="good" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,5 +1,3 @@
-// Décor de fond façon circuit imprimé : lignes fines qui se croisent avec un point
-// aux intersections, répété en pattern SVG. Purement décoratif, très faible opacité.
 export function CircuitBackground() {
   return (
     <svg

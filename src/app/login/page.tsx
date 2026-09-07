@@ -32,14 +32,13 @@ export default function LoginPage() {
     }
   };
 
-  // Connexion Google/GitHub à venir — pas encore branchée sur une vraie authentification.
   const handleOAuthClick = () => {
     router.push("/dashboard");
   };
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
-      {/* Décor de fond, cohérent avec la landing page. */}
+
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
         <div
           className="absolute inset-0"

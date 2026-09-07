@@ -31,8 +31,6 @@ export function NewProjectContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Une fois Railway connecté, le projet existe en base : on garde son id pour la suite
-  // (bouton GitHub, redirection finale).
   const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const [githubRepo, setGithubRepo] = useState<string | null>(null);
   const [githubBranch, setGithubBranch] = useState<string | null>(null);
@@ -204,8 +202,6 @@ export function NewProjectContent() {
   );
 }
 
-// Affiché juste après le retour de l'installation GitHub : sélection du dépôt puis de la
-// branche à associer au projet fraîchement créé.
 function GithubRepoPicker({
   projectId,
   installationId,

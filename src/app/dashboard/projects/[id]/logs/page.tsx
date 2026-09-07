@@ -20,8 +20,6 @@ type ApiLogEntry = {
   createdAt: string;
 };
 
-// Libellé "reclassifié par l'IA" affiché sous un log dont la catégorie initiale (posée par
-// les règles) a été corrigée par le triage IA local — voir originalCategory côté backend.
 function reclassifiedLabel(log: ApiLogEntry): string | null {
   if (!log.originalCategory) return null;
   const from = categoryLabels[log.originalCategory as LogCategory] ?? log.originalCategory;
@@ -41,11 +39,6 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
   const [explaining, setExplaining] = useState(false);
   const [explainError, setExplainError] = useState<string | null>(null);
 
-  // Demande l'explication du log actuellement ouvert dans le panneau à l'IA locale
-  // (voir POST /api/logs/:id/explain côté backend). Si déjà en cache, le backend renvoie
-  // du JSON classique. Sinon la réponse est streamée en texte brut au fil de la génération
-  // par l'IA : on l'affiche au fur et à mesure en mettant à jour aiSummary à chaque chunk,
-  // plutôt que d'attendre la fin (qui peut prendre plusieurs secondes).
   async function handleExplain(log: ApiLogEntry) {
     setExplaining(true);
     setExplainError(null);

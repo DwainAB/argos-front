@@ -1,7 +1,3 @@
-// Champs communs aux deux formulaires d'inscription (compte personnel et organisation) :
-// prénom, nom, email, mot de passe. Le champ "Nom de l'organisation" reste propre à
-// chaque page appelante, ajouté avant ou après selon le contexte.
-
 type SignupFieldsProps = {
   firstName: string;
   onFirstNameChange: (value: string) => void;

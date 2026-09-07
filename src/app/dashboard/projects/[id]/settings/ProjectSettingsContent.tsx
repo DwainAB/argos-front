@@ -9,13 +9,6 @@ import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton";
 import { ProjectSharesSection } from "@/components/dashboard/ProjectSharesSection";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
-import { IconPlus } from "@/components/icons/NavIcons";
-
-type NotifiedPerson = {
-  id: string;
-  name: string;
-  contact: string;
-};
 
 type GithubRepo = {
   id: number;
@@ -32,13 +25,6 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const { projects, loading: projectsLoading, refetch: refetchProjects } = useProjects();
   const project = projects.find((p) => p.id === projectId);
 
-  const [notified, setNotified] = useState<NotifiedPerson[]>([
-    { id: "p1", name: "Marine Sola", contact: "marinesola348@gmail.com" },
-  ]);
-  const [newName, setNewName] = useState("");
-  const [newContact, setNewContact] = useState("");
-
-  // Repos accessibles une fois l'installation GitHub effectuée.
   const [repos, setRepos] = useState<GithubRepo[] | null>(null);
   const [loadingRepos, setLoadingRepos] = useState(false);
   const [reposError, setReposError] = useState<string | null>(null);
@@ -57,7 +43,6 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const [nameError, setNameError] = useState<string | null>(null);
   const [nameSaved, setNameSaved] = useState(false);
 
-  // Une fois revenu de l'installation GitHub, on récupère la liste des repos accessibles.
   useEffect(() => {
     if (!githubInstallationId) return;
 
@@ -74,14 +59,12 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
       .finally(() => setLoadingRepos(false));
   }, [githubInstallationId]);
 
-  // Synchronise le champ nom avec le projet une fois chargé (et à chaque changement de projet).
   useEffect(() => {
     if (project) setProjectName(project.name);
   }, [project]);
 
   const selectedRepo = repos?.find((r) => r.fullName === selectedRepoFullName);
 
-  // Quand un repo est choisi, on récupère ses branches.
   useEffect(() => {
     if (!selectedRepo || !githubInstallationId) return;
 
@@ -154,20 +137,7 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     }
   };
 
-  const handleAddPerson = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newName.trim() || !newContact.trim()) return;
-    setNotified((prev) => [...prev, { id: crypto.randomUUID(), name: newName, contact: newContact }]);
-    setNewName("");
-    setNewContact("");
-  };
-
-  const handleRemovePerson = (id: string) => {
-    setNotified((prev) => prev.filter((p) => p.id !== id));
-  };
-
   const handleDelete = () => {
-    // Aucune suppression réelle pour l'instant, confirmation à brancher avec le backend.
   };
 
   if (projectsLoading) {
@@ -307,63 +277,6 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
       </SettingsSection>
 
       {currentUser.accountType === "organization" && <ProjectSharesSection projectId={projectId} />}
-
-      <SettingsSection
-        title="Personnes à notifier"
-        description="Ces personnes reçoivent un SMS ou un email lorsqu'une alerte est détectée sur ce projet."
-      >
-        <ul className="mb-4 space-y-2">
-          {notified.map((person) => (
-            <li
-              key={person.id}
-              className="flex items-center justify-between rounded-lg border border-surface-border/10 bg-surface px-3 py-2"
-            >
-              <div>
-                <p className="text-sm text-ink-primary">{person.name}</p>
-                <p className="text-xs text-ink-muted">{person.contact}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleRemovePerson(person.id)}
-                className="text-xs text-status-critical hover:underline"
-              >
-                Retirer
-              </button>
-            </li>
-          ))}
-          {notified.length === 0 && (
-            <p className="text-sm text-ink-secondary">Personne n'est notifié pour ce projet actuellement.</p>
-          )}
-        </ul>
-
-        <form onSubmit={handleAddPerson} className="flex items-end gap-3">
-          <div className="flex-1">
-            <TextInput
-              label="Nom"
-              id="new-person-name"
-              placeholder="Jean Dupont"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
-          </div>
-          <div className="flex-1">
-            <TextInput
-              label="Email ou téléphone"
-              id="new-person-contact"
-              placeholder="jean@exemple.com"
-              value={newContact}
-              onChange={(e) => setNewContact(e.target.value)}
-            />
-          </div>
-          <button
-            type="submit"
-            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
-          >
-            <IconPlus className="h-4 w-4" />
-            Ajouter
-          </button>
-        </form>
-      </SettingsSection>
 
       <section className="rounded-xl border border-status-critical/30 bg-status-critical/5 p-5">
         <h2 className="text-sm font-medium text-status-critical">Zone de danger</h2>
