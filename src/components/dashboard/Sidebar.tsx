@@ -19,6 +19,7 @@ import {
   IconChevronRight,
   IconLogout,
   IconOrganization,
+  IconBilling,
 } from "@/components/icons/NavIcons";
 
 type NavItem = {
@@ -30,13 +31,18 @@ type NavItem = {
 
 const POLL_INTERVAL_MS = 5000;
 
-const globalNavItems: NavItem[] = [
-  { label: "Vue d'ensemble", href: "/dashboard", icon: IconOverview },
-  { label: "Tous les projets", href: "/dashboard/projects", icon: IconProjects },
-  { label: "Organisations", href: "/dashboard/organizations", icon: IconOrganization },
-  { label: "Notifications", href: "/dashboard/notifications", icon: IconBell },
-  { label: "Paramètres du compte", href: "/dashboard/settings", icon: IconSettings },
-];
+function getGlobalNavItems(isOrganizationAccount: boolean): NavItem[] {
+  return [
+    { label: "Vue d'ensemble", href: "/dashboard", icon: IconOverview },
+    { label: "Tous les projets", href: "/dashboard/projects", icon: IconProjects },
+    { label: "Organisations", href: "/dashboard/organizations", icon: IconOrganization },
+    ...(isOrganizationAccount
+      ? [{ label: "Facturation", href: "/dashboard/organizations/billing", icon: IconBilling }]
+      : []),
+    { label: "Notifications", href: "/dashboard/notifications", icon: IconBell },
+    { label: "Paramètres du compte", href: "/dashboard/settings", icon: IconSettings },
+  ];
+}
 
 function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
   const base = `/dashboard/projects/${projectId}`;
@@ -92,7 +98,9 @@ export function Sidebar() {
     };
   }, [activeProjectId]);
 
-  const items = activeProjectId ? getProjectNavItems(activeProjectId, alertsCount) : globalNavItems;
+  const items = activeProjectId
+    ? getProjectNavItems(activeProjectId, alertsCount)
+    : getGlobalNavItems(user.accountType === "organization");
 
   return (
     <aside

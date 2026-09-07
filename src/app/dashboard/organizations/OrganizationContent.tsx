@@ -215,44 +215,6 @@ function InvitationsSection({
   );
 }
 
-function ProjectsSection({ projects }: { projects: { id: string; name: string }[] }) {
-  return (
-    <SettingsSection title="Projets" description="Projets appartenant à votre organisation, accessibles à tous ses membres.">
-      {projects.length === 0 ? (
-        <p className="text-sm text-ink-secondary">Aucun projet pour l'instant.</p>
-      ) : (
-        <ul className="space-y-2">
-          {projects.map((project) => (
-            <li key={project.id} className="rounded-lg border border-surface-border/10 bg-surface px-3 py-2">
-              <p className="text-sm text-ink-primary">{project.name}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </SettingsSection>
-  );
-}
-
-function BillingSection() {
-  return (
-    <SettingsSection title="Facturation" description="Plan actuel et gestion de l'abonnement de votre organisation.">
-      <div className="flex items-center justify-between rounded-lg border border-surface-border/10 bg-surface px-4 py-3">
-        <div>
-          <p className="text-sm text-ink-primary">Plan Gratuit</p>
-          <p className="text-xs text-ink-muted">Facturation à venir.</p>
-        </div>
-        <button
-          type="button"
-          disabled
-          className="rounded-lg border border-surface-border/10 px-4 py-2 text-sm text-ink-muted disabled:cursor-not-allowed"
-        >
-          Gérer l'abonnement
-        </button>
-      </div>
-    </SettingsSection>
-  );
-}
-
 export function OrganizationContent() {
   const user = useCurrentUser();
   const { organization, loading, error, refetch } = useOrganization();
@@ -290,13 +252,11 @@ export function OrganizationContent() {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-lg font-semibold text-ink-primary">{organization.name}</h1>
-        <p className="text-sm text-ink-secondary">Gestion des membres, des projets et de la facturation.</p>
+        <p className="text-sm text-ink-secondary">Gestion des membres de l'organisation.</p>
       </div>
 
       <MembersSection members={organization.members} myUserId={user.id} isAdmin={isAdmin} onChanged={refetch} />
       {isAdmin && <InvitationsSection invitations={organization.invitations} onChanged={refetch} />}
-      <ProjectsSection projects={organization.projects} />
-      {isAdmin && <BillingSection />}
     </div>
   );
 }

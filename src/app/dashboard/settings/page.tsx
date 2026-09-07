@@ -4,10 +4,17 @@ import { useState } from "react";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { ThemeToggle } from "@/components/dashboard/ThemeToggle";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
+import { useCurrentUser } from "@/components/dashboard/UserContext";
+import { ApiAuthError, updatePhone } from "@/lib/auth";
 
 export default function AccountSettingsPage() {
+  const user = useCurrentUser();
+
   const [language, setLanguage] = useState("fr");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(user.phone ?? "");
+  const [phoneSaving, setPhoneSaving] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [phoneSaved, setPhoneSaved] = useState(false);
 
   const handleLanguageSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,8 +24,20 @@ export default function AccountSettingsPage() {
     e.preventDefault();
   };
 
-  const handlePhoneSubmit = (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPhoneSaving(true);
+    setPhoneError(null);
+    setPhoneSaved(false);
+
+    try {
+      await updatePhone(phone);
+      setPhoneSaved(true);
+    } catch (err) {
+      setPhoneError(err instanceof ApiAuthError ? err.message : "Impossible d'enregistrer ce numéro.");
+    } finally {
+      setPhoneSaving(false);
+    }
   };
 
   return (
@@ -77,7 +96,7 @@ export default function AccountSettingsPage() {
 
       <SettingsSection
         title="Numéro de téléphone"
-        description="Utilisé pour l'envoi des notifications par SMS."
+        description="Utilisé pour l'envoi des notifications par SMS. Format international requis, ex. +33612345678."
       >
         <form onSubmit={handlePhoneSubmit} className="flex items-end gap-3">
           <div className="flex-1">
@@ -85,18 +104,24 @@ export default function AccountSettingsPage() {
               label="Numéro de téléphone"
               id="phone"
               type="tel"
-              placeholder="+33 6 12 34 56 78"
+              placeholder="+33612345678"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setPhoneSaved(false);
+              }}
             />
           </div>
           <button
             type="submit"
-            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
+            disabled={phoneSaving}
+            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Enregistrer
+            {phoneSaving ? "Enregistrement..." : "Enregistrer"}
           </button>
         </form>
+        {phoneError && <p className="mt-2 text-sm text-status-critical">{phoneError}</p>}
+        {phoneSaved && !phoneError && <p className="mt-2 text-sm text-status-good">Numéro enregistré.</p>}
       </SettingsSection>
     </div>
   );
