@@ -11,6 +11,7 @@ export type CurrentUser = {
   accountType: AccountType;
   organizationName: string | null;
   createdAt: string;
+  organizationRole: "admin" | "user" | null;
 };
 
 // Erreur portant le message renvoyé par le backend (ex: "Email déjà utilisé"), pour
