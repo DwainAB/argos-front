@@ -55,6 +55,16 @@ export async function logout() {
   await apiFetch("/api/auth/logout", { method: "POST" });
 }
 
+export async function updatePhone(phone: string) {
+  const res = await apiFetch("/api/auth/me", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone }),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.user as CurrentUser;
+}
+
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const res = await apiFetch("/api/auth/me");
 
