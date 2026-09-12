@@ -20,26 +20,42 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
 
-    getCurrentUser()
-      .then((fetchedUser) => {
-        if (cancelled) return;
-        if (!fetchedUser) {
-          router.replace("/login");
-          return;
-        }
-        if (!fetchedUser.hasActiveSubscription && pathname !== SUBSCRIBE_PATH) {
-          router.replace(SUBSCRIBE_PATH);
-          return;
-        }
-        setUser(fetchedUser);
-      })
-      .catch((err) => {
-        console.error("Erreur lors de la vérification de la session :", err);
-        if (!cancelled) router.replace("/login");
-      });
+    const checkSession = () => {
+      getCurrentUser()
+        .then((fetchedUser) => {
+          if (cancelled) return;
+          if (!fetchedUser) {
+            router.replace("/login");
+            return;
+          }
+          if (!fetchedUser.hasActiveSubscription && pathname !== SUBSCRIBE_PATH) {
+            router.replace(SUBSCRIBE_PATH);
+            return;
+          }
+          if (fetchedUser.hasActiveSubscription && pathname === SUBSCRIBE_PATH) {
+            router.replace("/dashboard");
+            return;
+          }
+          setUser(fetchedUser);
+        })
+        .catch((err) => {
+          console.error("Erreur lors de la vérification de la session :", err);
+          if (!cancelled) router.replace("/login");
+        });
+    };
+
+    checkSession();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && pathname === SUBSCRIBE_PATH) {
+        checkSession();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [router, pathname]);
 
