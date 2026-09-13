@@ -5,7 +5,7 @@ import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { ThemeToggle } from "@/components/dashboard/ThemeToggle";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { useCurrentUser } from "@/components/dashboard/UserContext";
-import { ApiAuthError, updatePhone } from "@/lib/auth";
+import { ApiAuthError, changePassword, updatePhone } from "@/lib/auth";
 
 export default function AccountSettingsPage() {
   const user = useCurrentUser();
@@ -16,12 +16,43 @@ export default function AccountSettingsPage() {
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [phoneSaved, setPhoneSaved] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+
   const handleLanguageSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError(null);
+    setPasswordSaved(false);
+
+    if (newPassword.length < 8) {
+      setPasswordError("Le nouveau mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Les deux mots de passe ne correspondent pas.");
+      return;
+    }
+
+    setPasswordSaving(true);
+    try {
+      await changePassword({ currentPassword, newPassword });
+      setPasswordSaved(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPasswordError(err instanceof ApiAuthError ? err.message : "Impossible de mettre à jour le mot de passe.");
+    } finally {
+      setPasswordSaving(false);
+    }
   };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
@@ -77,21 +108,51 @@ export default function AccountSettingsPage() {
 
       <SettingsSection title="Mot de passe" description="Modifiez le mot de passe de votre compte.">
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
-          <TextInput label="Mot de passe actuel" id="current-password" type="password" placeholder="••••••••" />
-          <TextInput label="Nouveau mot de passe" id="new-password" type="password" placeholder="••••••••" />
+          <TextInput
+            label="Mot de passe actuel"
+            id="current-password"
+            type="password"
+            placeholder="••••••••"
+            value={currentPassword}
+            onChange={(e) => {
+              setCurrentPassword(e.target.value);
+              setPasswordSaved(false);
+            }}
+          />
+          <TextInput
+            label="Nouveau mot de passe"
+            id="new-password"
+            type="password"
+            placeholder="••••••••"
+            value={newPassword}
+            onChange={(e) => {
+              setNewPassword(e.target.value);
+              setPasswordSaved(false);
+            }}
+          />
           <TextInput
             label="Confirmer le nouveau mot de passe"
             id="confirm-password"
             type="password"
             placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setPasswordSaved(false);
+            }}
           />
           <button
             type="submit"
-            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
+            disabled={passwordSaving}
+            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Mettre à jour le mot de passe
+            {passwordSaving ? "Mise à jour..." : "Mettre à jour le mot de passe"}
           </button>
         </form>
+        {passwordError && <p className="mt-2 text-sm text-status-critical">{passwordError}</p>}
+        {passwordSaved && !passwordError && (
+          <p className="mt-2 text-sm text-status-good">Mot de passe mis à jour.</p>
+        )}
       </SettingsSection>
 
       <SettingsSection

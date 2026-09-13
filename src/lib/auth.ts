@@ -67,6 +67,16 @@ export async function updatePhone(phone: string) {
   return data.user as CurrentUser;
 }
 
+export async function changePassword(input: { currentPassword: string; newPassword: string }) {
+  const res = await apiFetch("/api/auth/password", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.user as CurrentUser;
+}
+
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const res = await apiFetch("/api/auth/me");
 
