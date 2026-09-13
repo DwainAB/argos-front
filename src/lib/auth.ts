@@ -57,6 +57,18 @@ export async function logout() {
   await apiFetch("/api/auth/logout", { method: "POST" });
 }
 
+// idToken vient de Google Identity Services (bouton "Continuer avec Google", flux 100%
+// frontend) — vérifié côté backend avant toute connexion.
+export async function loginWithGoogle(idToken: string) {
+  const res = await apiFetch("/api/auth/google", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.user as CurrentUser;
+}
+
 export async function updatePhone(phone: string) {
   const res = await apiFetch("/api/auth/me", {
     method: "PATCH",
