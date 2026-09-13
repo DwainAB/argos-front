@@ -14,6 +14,7 @@ type ApiAlert = {
   proposedFilePath: string | null;
   proposedOldCode: string | null;
   proposedNewCode: string | null;
+  proposedExplanation: string | null;
   pullRequestUrl: string | null;
   logEntry: {
     id: string;
@@ -192,6 +193,15 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
       {alert.status !== "open" && alert.proposedFilePath && (
         <section className="space-y-3 rounded-xl border border-surface-border/10 bg-surface-raised p-4">
           <h2 className="text-sm font-medium text-ink-secondary">Correctif proposé — {alert.proposedFilePath}</h2>
+
+          {alert.proposedExplanation && (
+            <div>
+              <p className="mb-1 text-xs text-ink-muted">Explication de l'IA</p>
+              <p className="rounded-lg border border-accent-500/20 bg-accent-500/5 p-3 text-sm text-ink-primary">
+                {alert.proposedExplanation}
+              </p>
+            </div>
+          )}
 
           <div>
             <p className="mb-1 text-xs text-ink-muted">Code actuel</p>
