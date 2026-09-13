@@ -77,6 +77,26 @@ export async function changePassword(input: { currentPassword: string; newPasswo
   return data.user as CurrentUser;
 }
 
+export async function forgotPassword(email: string) {
+  const res = await apiFetch("/api/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.message as string;
+}
+
+export async function resetPassword(input: { token: string; newPassword: string }) {
+  const res = await apiFetch("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.message as string;
+}
+
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const res = await apiFetch("/api/auth/me");
 
