@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/icons/Logo";
-import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { GithubIcon } from "@/components/icons/GithubIcon";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
-import { ApiAuthError, login } from "@/lib/auth";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { ApiAuthError, loginWithGoogle, login } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +33,21 @@ export default function LoginPage() {
     }
   };
 
-  const handleOAuthClick = () => {
+  const handleGoogleIdToken = async (idToken: string) => {
+    setGoogleSubmitting(true);
+    setError(null);
+
+    try {
+      await loginWithGoogle(idToken);
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof ApiAuthError ? err.message : "Impossible de vous connecter avec Google.");
+    } finally {
+      setGoogleSubmitting(false);
+    }
+  };
+
+  const handleGithubClick = () => {
     router.push("/dashboard");
   };
 
@@ -117,18 +132,11 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <button
-              type="button"
-              onClick={handleOAuthClick}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-surface-border/10 bg-surface py-2 text-sm font-medium text-ink-primary transition hover:border-accent-500/30 hover:bg-surface-border/5"
-            >
-              <GoogleIcon className="h-4 w-4" />
-              Continuer avec Google
-            </button>
+            <GoogleSignInButton onIdToken={handleGoogleIdToken} disabled={googleSubmitting} />
 
             <button
               type="button"
-              onClick={handleOAuthClick}
+              onClick={handleGithubClick}
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-surface-border/10 bg-surface py-2 text-sm font-medium text-ink-primary transition hover:border-accent-500/30 hover:bg-surface-border/5"
             >
               <GithubIcon className="h-4 w-4" />
