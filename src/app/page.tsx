@@ -1,78 +1,91 @@
 import Link from "next/link";
-import { Logo } from "@/components/icons/Logo";
+import Image from "next/image";
 import {
   IconRadar,
   IconBolt,
   IconTranslate,
   IconPullRequest,
+  IconShield,
   IconCheck,
 } from "@/components/icons/LandingIcons";
 import { LiveLogTerminal } from "@/components/landing/LiveLogTerminal";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
+import { ArgosMascot } from "@/components/landing/ArgosMascot";
+import { WorldGlobeSection } from "@/components/landing/WorldGlobeSection";
+import { FeaturesCarousel } from "@/components/landing/FeaturesCarousel";
+
+export const dynamic = "force-dynamic";
 
 const features = [
   {
-    icon: IconRadar,
+    icon: <IconRadar className="h-5 w-5" />,
     title: "Surveillance 24h/24, 7j/7",
     description:
-      "Une IA observe vos serveurs en continu, sans interruption, pour repérer le moindre signe de défaillance avant qu'il ne devienne un incident.",
+      "Argos observe vos serveurs en continu, sans interruption, pour repérer le moindre signe de défaillance avant qu'il ne devienne un incident.",
   },
   {
-    icon: IconBolt,
+    icon: <IconBolt className="h-5 w-5" />,
     title: "Alertes à la seconde près",
     description:
       "Dès qu'un problème est détecté, les bonnes personnes sont prévenues instantanément par SMS ou par email — plus besoin de surveiller vous-même vos tableaux de bord.",
   },
   {
-    icon: IconTranslate,
+    icon: <IconTranslate className="h-5 w-5" />,
     title: "Vos logs, enfin compréhensibles",
     description:
-      "Argos AI traduit chaque log technique en langage clair, pour que toute votre équipe comprenne immédiatement ce qui se passe sur vos serveurs.",
+      "Argos traduit chaque log technique en langage clair, pour que toute votre équipe comprenne immédiatement ce qui se passe sur vos serveurs.",
   },
   {
-    icon: IconPullRequest,
+    icon: <IconPullRequest className="h-5 w-5" />,
     title: "Des correctifs proposés, jamais imposés",
     description:
-      "Quand une erreur revient dans vos logs, Argos AI peut proposer un correctif et ouvrir une pull request sur votre dépôt GitHub. C'est vous qui décidez de la valider.",
+      "Quand une erreur revient dans vos logs, Argos peut proposer un correctif et ouvrir une pull request sur votre dépôt GitHub. C'est vous qui décidez de la valider.",
+  },
+  {
+    icon: <IconShield className="h-5 w-5" />,
+    title: "Argos Security, votre code passé au crible",
+    description:
+      "Argos Security analyse le code de votre dépôt, détecte les failles de sécurité et vulnérabilités, et vous les remonte clairement avant qu'elles ne deviennent un problème en production.",
   },
 ];
 
 const plans = [
   {
-    name: "Starter",
-    price: "Gratuit",
-    period: "",
-    description: "Pour tester Argos AI sur un premier projet.",
-    features: ["1 projet surveillé", "Alertes par email", "Historique 7 jours"],
+    name: "Solo",
+    price: "19€",
+    period: "/mois",
+    description: "Pour un développeur qui veut surveiller ses projets en toute tranquillité.",
+    features: [
+      "3 projets surveillés",
+      "1 membre",
+      "Emails illimités",
+      "Notifications SMS",
+      "Corrections IA",
+    ],
     highlighted: false,
+    trialBadge: "Essai gratuit de 14 jours",
   },
   {
-    name: "Pro",
-    price: "À partir de 19€",
+    name: "Business",
+    price: "49€",
     period: "/mois",
     description: "Pour les équipes qui veulent une tranquillité d'esprit totale.",
     features: [
       "Projets illimités",
-      "Alertes SMS et email",
-      "Historique illimité",
-      "Traduction des logs en langage clair",
+      "Membres illimités",
+      "Emails illimités",
+      "Notifications SMS élargies",
+      "Corrections IA élargies",
     ],
     highlighted: true,
-  },
-  {
-    name: "Business",
-    price: "Sur devis",
-    period: "",
-    description: "Pour les organisations avec plusieurs équipes et environnements.",
-    features: ["Tout Pro inclus", "Gestion multi-équipes", "Support prioritaire"],
-    highlighted: false,
   },
 ];
 
 export default function HomePage() {
   return (
     <main className="relative min-h-screen overflow-x-clip">
+      <ArgosMascot />
 
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
         <div
@@ -89,9 +102,7 @@ export default function HomePage() {
 
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400">
-            <Logo className="h-5 w-5" />
-          </span>
+          <Image src="/logo-argos.png" alt="Argos AI" width={32} height={32} className="h-8 w-8" />
           <span className="text-sm font-semibold text-ink-primary">Argos AI</span>
         </div>
         <Link
@@ -112,7 +123,7 @@ export default function HomePage() {
             Vos serveurs, sous surveillance permanente
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-ink-secondary sm:text-lg">
-            Argos AI surveille vos serveurs en continu, vous alerte à la seconde où un problème
+            Argos surveille vos serveurs en continu, vous alerte à la seconde où un problème
             survient, et vous explique clairement ce qu'il se passe. Une tranquillité d'esprit
             que vous n'aviez pas encore.
           </p>
@@ -137,28 +148,12 @@ export default function HomePage() {
             Une intelligence artificielle dédiée à vos serveurs
           </h2>
           <p className="mt-3 text-sm text-ink-secondary sm:text-base">
-            Argos AI ne se contente pas de surveiller : elle comprend, elle alerte, et elle vous
+            Argos ne se contente pas de surveiller : il comprend, il alerte, et il vous
             explique.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="group relative overflow-hidden rounded-xl border border-surface-border/10 bg-surface-raised p-6 transition hover:border-accent-500/30"
-            >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-accent-500/0 blur-2xl transition group-hover:bg-accent-500/10" />
-              <span className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400">
-                <Icon className="h-5 w-5" />
-              </span>
-              <h3 className="relative mt-4 text-base font-semibold text-ink-primary">{title}</h3>
-              <p className="relative mt-2 text-sm leading-relaxed text-ink-secondary">
-                {description}
-              </p>
-            </div>
-          ))}
-        </div>
+        <FeaturesCarousel features={features} />
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
@@ -167,11 +162,11 @@ export default function HomePage() {
             Un tarif adapté à chaque équipe
           </h2>
           <p className="mt-3 text-sm text-ink-secondary sm:text-base">
-            Commencez gratuitement, évoluez quand vous en avez besoin.
+            Essai gratuit de 14 jours sur le plan Solo, évoluez quand vous en avez besoin.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -190,6 +185,11 @@ export default function HomePage() {
               {plan.highlighted && (
                 <span className="relative mb-3 inline-flex w-fit items-center rounded-full bg-accent-500/10 px-2.5 py-0.5 text-xs font-medium text-accent-400">
                   Le plus populaire
+                </span>
+              )}
+              {plan.trialBadge && (
+                <span className="relative mb-3 inline-flex w-fit items-center rounded-full bg-amber-400/10 px-2.5 py-0.5 text-xs font-medium text-amber-400">
+                  {plan.trialBadge}
                 </span>
               )}
               <h3 className="relative text-base font-semibold text-ink-primary">{plan.name}</h3>
@@ -223,6 +223,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <WorldGlobeSection />
+
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-2xl font-semibold text-ink-primary sm:text-3xl">
@@ -239,9 +241,7 @@ export default function HomePage() {
       <footer className="border-t border-surface-border/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-ink-muted sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-accent-500/10 text-accent-400">
-              <Logo className="h-3.5 w-3.5" />
-            </span>
+            <Image src="/logo-argos.png" alt="Argos AI" width={24} height={24} className="h-6 w-6" />
             <span className="font-medium text-ink-secondary">Argos AI</span>
           </div>
           <p>© {new Date().getFullYear()} Argos AI. Tous droits réservés.</p>
