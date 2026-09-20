@@ -15,6 +15,7 @@ import {
   IconSettings,
   IconLogs,
   IconIntegrations,
+  IconShield,
   IconChevronLeft,
   IconChevronRight,
   IconLogout,
@@ -48,6 +49,7 @@ function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
     { label: "Aperçu", href: base, icon: IconOverview },
     { label: "Logs", href: `${base}/logs`, icon: IconLogs },
     { label: "Alertes", href: `${base}/alerts`, icon: IconBell, badge: alertsCount },
+    { label: "Argos Security", href: `${base}/code-analysis`, icon: IconShield },
     { label: "Intégrations", href: `${base}/integrations`, icon: IconIntegrations },
     { label: "Paramètres du projet", href: `${base}/settings`, icon: IconSettings },
   ];

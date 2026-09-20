@@ -131,6 +131,20 @@ export function IconBilling({ className }: IconProps) {
   );
 }
 
+export function IconShield({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 3.5 5 6v5.5c0 4.5 3 8 7 9 4-1 7-4.5 7-9V6l-7-2.5Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="m9.2 12.2 2 2 3.6-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function IconLogout({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">

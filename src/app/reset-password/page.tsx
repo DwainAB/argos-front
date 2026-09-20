@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Logo } from "@/components/icons/Logo";
+import Image from "next/image";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
 import { ApiAuthError, resetPassword } from "@/lib/auth";
 
@@ -121,9 +121,7 @@ export default function ResetPasswordPage() {
 
       <div className="w-full max-w-sm">
         <Link href="/" className="mb-8 flex flex-col items-center text-center">
-          <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400">
-            <Logo className="h-6 w-6" />
-          </span>
+          <Image src="/logo-argos.png" alt="Argos AI" width={40} height={40} className="mb-2 h-10 w-10" />
           <h1 className="text-xl font-semibold text-ink-primary">Argos AI</h1>
           <p className="mt-1 text-sm text-ink-secondary">Choisissez un nouveau mot de passe</p>
         </Link>
