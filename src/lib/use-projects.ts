@@ -10,6 +10,8 @@ export type ApiProject = {
   githubBranch: string | null;
   railwayServiceId: string | null;
   railwayEnvironmentId: string | null;
+  renderOwnerId: string | null;
+  renderResourceId: string | null;
   createdAt: string;
 
   user: { accountType: "personal" | "organization"; organizationName: string | null };
