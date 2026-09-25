@@ -14,7 +14,10 @@ type GithubInstallation = {
 };
 
 type GithubConnectButtonProps = {
-  projectId: string;
+  // Null tant que le projet n'a pas encore été créé (formulaire "Ajouter un projet") — sert
+  // uniquement à être relayé dans le postMessage du popup, jamais utilisé par le backend pour
+  // l'installation elle-même.
+  projectId: string | null;
   disabled?: boolean;
   onResult: (result: GithubInstallResult) => void;
   children: React.ReactNode;
@@ -54,7 +57,7 @@ export function GithubConnectButton({ projectId, disabled, onResult, children, c
     const top = window.screenY + (window.outerHeight - height) / 2;
 
     window.open(
-      `${API_URL}/api/integrations/github/start?projectId=${projectId}`,
+      `${API_URL}/api/integrations/github/start?projectId=${projectId ?? ""}`,
       "argos-github-install",
       `width=${width},height=${height},left=${left},top=${top}`
     );
