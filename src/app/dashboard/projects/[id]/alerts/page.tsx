@@ -10,6 +10,7 @@ import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 type ApiAlert = {
   id: string;
   explanation: string;
+  fixLocation: "code" | "external";
   status: "open" | "fix_proposed" | "fix_accepted" | "fix_rejected";
   resolvedAt: string | null;
   createdAt: string;
@@ -104,7 +105,14 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
                 >
                   <CategoryBadge category={alert.logEntry.category} />
                   <div className="min-w-0 flex-1 overflow-hidden">
-                    <p className="truncate text-ink-primary">{alert.explanation}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-ink-primary">{alert.explanation}</p>
+                      {alert.fixLocation === "external" && (
+                        <span className="shrink-0 rounded-full border border-status-warning/20 bg-status-warning/10 px-2 py-0.5 text-xs font-medium text-status-warning">
+                          Action externe requise
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 truncate font-mono text-xs text-ink-muted">{alert.logEntry.rawMessage}</p>
                   </div>
                   <span className="flex shrink-0 flex-col items-end text-xs text-ink-muted">
