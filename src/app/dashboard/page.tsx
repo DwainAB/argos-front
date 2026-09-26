@@ -6,6 +6,7 @@ import { useProjects } from "@/lib/use-projects";
 import { apiFetch } from "@/lib/api-fetch";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { useCurrentUser } from "@/components/dashboard/UserContext";
+import { ProjectAlertsSummaryChart } from "@/components/dashboard/ProjectAlertsSummaryChart";
 
 function greeting() {
   const hour = new Date().getHours();
@@ -76,6 +77,8 @@ export default function DashboardOverviewPage() {
 
         <StatCard label="Notifications (24h)" value="0" />
       </div>
+
+      <ProjectAlertsSummaryChart />
 
       <section>
         <div className="mb-3 flex items-center justify-between">

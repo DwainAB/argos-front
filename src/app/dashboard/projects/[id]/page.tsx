@@ -6,6 +6,7 @@ import { useProjects } from "@/lib/use-projects";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBanner } from "@/components/dashboard/StatusBanner";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
+import { LogsTimeseriesChart } from "@/components/dashboard/LogsTimeseriesChart";
 
 type ProjectOverview = {
   latestDeployment: { id: string; status: string; createdAt: string } | null;
@@ -102,6 +103,8 @@ export default function ProjectOverviewPage({ params }: { params: { id: string }
         />
         <StatCard label="Alertes actives" value="—" />
       </div>
+
+      <LogsTimeseriesChart projectId={params.id} />
 
       <p className="text-xs text-ink-muted">
         Les alertes détaillées seront disponibles une fois l'analyse IA des logs branchée. Consultez la page{" "}
