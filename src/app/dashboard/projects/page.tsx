@@ -42,7 +42,15 @@ export default function AllProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-ink-primary">Tous les projets</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-ink-primary">Tous les projets</h1>
+        <Link
+          href="/dashboard/projects/new"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
+        >
+          Ajouter un projet
+        </Link>
+      </div>
 
       <div className="overflow-hidden rounded-xl border border-surface-border/10 bg-surface-raised">
         {loading ? (
@@ -50,12 +58,6 @@ export default function AllProjectsPage() {
         ) : projects.length === 0 ? (
           <div className="px-4 py-8 text-center">
             <p className="text-sm text-ink-secondary">Vous n'avez actuellement aucun projet connecté.</p>
-            <Link
-              href="/dashboard/projects/new"
-              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
-            >
-              Ajouter un projet
-            </Link>
           </div>
         ) : (
           <ul className="divide-y divide-surface-border/10">

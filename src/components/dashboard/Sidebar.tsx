@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useSidebar } from "./SidebarContext";
@@ -8,13 +9,13 @@ import { useCurrentUser } from "./UserContext";
 import { Modal } from "./Modal";
 import { apiFetch } from "@/lib/api-fetch";
 import { logout } from "@/lib/auth";
+import { useProjects } from "@/lib/use-projects";
 import {
   IconOverview,
   IconProjects,
   IconBell,
   IconSettings,
   IconLogs,
-  IconIntegrations,
   IconShield,
   IconChevronLeft,
   IconChevronRight,
@@ -32,11 +33,13 @@ type NavItem = {
 
 const POLL_INTERVAL_MS = 5000;
 
-function getGlobalNavItems(): NavItem[] {
+function getGlobalNavItems(isOrganizationAccount: boolean): NavItem[] {
   return [
     { label: "Vue d'ensemble", href: "/dashboard", icon: IconOverview },
     { label: "Tous les projets", href: "/dashboard/projects", icon: IconProjects },
-    { label: "Organisations", href: "/dashboard/organizations", icon: IconOrganization },
+    ...(isOrganizationAccount
+      ? [{ label: "Organisations", href: "/dashboard/organizations", icon: IconOrganization }]
+      : []),
     { label: "Facturation", href: "/dashboard/organizations/billing", icon: IconBilling },
     { label: "Notifications", href: "/dashboard/notifications", icon: IconBell },
     { label: "Paramètres du compte", href: "/dashboard/settings", icon: IconSettings },
@@ -50,7 +53,6 @@ function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
     { label: "Logs", href: `${base}/logs`, icon: IconLogs },
     { label: "Alertes", href: `${base}/alerts`, icon: IconBell, badge: alertsCount },
     { label: "Argos Security", href: `${base}/code-analysis`, icon: IconShield },
-    { label: "Intégrations", href: `${base}/integrations`, icon: IconIntegrations },
     { label: "Paramètres du projet", href: `${base}/settings`, icon: IconSettings },
   ];
 }
@@ -62,7 +64,10 @@ export function Sidebar() {
   const user = useCurrentUser();
 
   const projectMatch = pathname.match(/^\/dashboard\/projects\/([^/]+)/);
-  const activeProjectId = projectMatch?.[1];
+  const activeProjectId = projectMatch?.[1] !== "new" ? projectMatch?.[1] : undefined;
+
+  const { projects } = useProjects();
+  const activeProject = projects.find((p) => p.id === activeProjectId);
 
   const [alertsCount, setAlertsCount] = useState(0);
   const [confirmingLogout, setConfirmingLogout] = useState(false);
@@ -98,7 +103,9 @@ export function Sidebar() {
     };
   }, [activeProjectId]);
 
-  const items = activeProjectId ? getProjectNavItems(activeProjectId, alertsCount) : getGlobalNavItems();
+  const items = activeProjectId
+    ? getProjectNavItems(activeProjectId, alertsCount)
+    : getGlobalNavItems(user.accountType === "organization");
 
   return (
     <aside
@@ -119,15 +126,8 @@ export function Sidebar() {
         ) : (
           <>
             <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent-500/10 text-accent-400">
-                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
-                  <path
-                    d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+              <span className="relative flex h-7 w-7 shrink-0 items-center justify-center">
+                <Image src="/logo-argos.png" alt="Argos AI" fill className="object-contain" priority />
               </span>
               <span className="whitespace-nowrap text-sm font-semibold text-ink-primary">Argos AI</span>
             </Link>
@@ -145,6 +145,21 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-3">
+        {activeProjectId && (
+          <Link
+            href="/dashboard"
+            title={collapsed ? "Retour à la vue d'ensemble" : undefined}
+            className={`mb-2 flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm text-ink-secondary transition hover:bg-surface-border/5 hover:text-ink-primary ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <IconChevronLeft className="h-4 w-4 shrink-0" />
+            {!collapsed && (
+              <span className="truncate">{activeProject ? activeProject.name : "Vue d'ensemble"}</span>
+            )}
+          </Link>
+        )}
+        {activeProjectId && !collapsed && <div className="mb-2 border-t border-surface-border/10" />}
         {items.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;

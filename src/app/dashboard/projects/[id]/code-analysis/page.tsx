@@ -126,9 +126,9 @@ export default function ProjectCodeAnalysisPage({ params }: { params: { id: stri
         <h1 className="text-xl font-semibold text-ink-primary">Argos Security</h1>
         {project && <ProjectOwnerBadge project={project} />}
       </div>
-      <p className="-mt-4 text-sm text-ink-secondary">
-        Fait analyser l'intégralité du dépôt par l'IA : performance, sécurité, secrets exposés, architecture,
-        dépendances, code mort, gestion d'erreurs et tests.
+      <p className="-mt-4 max-w-2xl text-sm text-ink-secondary">
+        Argos analyse votre dépôt pour détecter failles de sécurité, secrets exposés et autres problèmes de code, et
+        vous propose une recommandation pour chacun.
       </p>
 
       {!hasGithub ? (

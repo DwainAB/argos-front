@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { CategoryBadge, categoryLabels, type LogCategory } from "@/components/dashboard/CategoryBadge";
 import { TriageStatusBadge } from "@/components/dashboard/TriageStatusBadge";
+import { TriageMascotBubble } from "@/components/dashboard/TriageMascotBubble";
 import { SidePanel } from "@/components/dashboard/SidePanel";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 
@@ -104,8 +105,12 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
     };
   }, [params.id]);
 
+  const isChecking = logs.some((log) => log.triageStatus === "checking");
+
   return (
     <div className="space-y-6">
+      <TriageMascotBubble isChecking={isChecking} />
+
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-xl font-semibold text-ink-primary">Logs</h1>

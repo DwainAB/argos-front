@@ -25,14 +25,22 @@ type ApiAlert = {
 };
 
 const POLL_INTERVAL_MS = 5000;
+const PAGE_SIZE = 10;
 
 export default function ProjectAlertsPage({ params }: { params: { id: string } }) {
   const { projects } = useProjects();
   const project = projects.find((p) => p.id === params.id);
 
   const [alerts, setAlerts] = useState<ApiAlert[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
+  const [page, setPage] = useState(0);
+
+  // Revenir à la première page quand on change de vue (alertes actives / historique).
+  useEffect(() => {
+    setPage(0);
+  }, [showHistory]);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,10 +48,13 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
     async function fetchAlerts() {
       try {
         const res = await apiFetch(
-          `/api/projects/${params.id}/alerts?resolved=${showHistory ? "true" : "false"}`
+          `/api/projects/${params.id}/alerts?resolved=${showHistory ? "true" : "false"}&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`
         );
         const data = await res.json();
-        if (!cancelled) setAlerts(data.alerts ?? []);
+        if (!cancelled) {
+          setAlerts(data.alerts ?? []);
+          setTotal(data.total ?? 0);
+        }
       } catch (err) {
         console.error("Erreur lors du chargement des alertes :", err);
       } finally {
@@ -59,7 +70,9 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
       cancelled = true;
       clearInterval(interval);
     };
-  }, [params.id, showHistory]);
+  }, [params.id, showHistory, page]);
+
+  const pageCount = Math.max(Math.ceil(total / PAGE_SIZE), 1);
 
   return (
     <div className="space-y-6">
@@ -136,6 +149,32 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
           </ul>
         )}
       </div>
+
+      {!loading && total > PAGE_SIZE && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-ink-secondary">
+            Page {page + 1} sur {pageCount} · {total} alerte{total > 1 ? "s" : ""}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(p - 1, 0))}
+              disabled={page === 0}
+              className="rounded-lg border border-surface-border/10 bg-surface px-3 py-1.5 text-ink-secondary transition hover:bg-surface-border/5 hover:text-ink-primary disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Précédent
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(p + 1, pageCount - 1))}
+              disabled={page >= pageCount - 1}
+              className="rounded-lg border border-surface-border/10 bg-surface px-3 py-1.5 text-ink-secondary transition hover:bg-surface-border/5 hover:text-ink-primary disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Suivant
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
