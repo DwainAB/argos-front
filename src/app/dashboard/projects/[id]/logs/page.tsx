@@ -39,6 +39,20 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
   const [selectedLog, setSelectedLog] = useState<ApiLogEntry | null>(null);
   const [explaining, setExplaining] = useState(false);
   const [explainError, setExplainError] = useState<string | null>(null);
+  const [copiedLogId, setCopiedLogId] = useState<string | null>(null);
+
+  async function handleCopyLog(e: React.MouseEvent, log: ApiLogEntry) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      await navigator.clipboard.writeText(log.rawMessage);
+      setCopiedLogId(log.id);
+      setTimeout(() => setCopiedLogId((current) => (current === log.id ? null : current)), 1500);
+    } catch (err) {
+      console.error("Erreur lors de la copie du log :", err);
+    }
+  }
 
   async function handleExplain(log: ApiLogEntry) {
     setExplaining(true);
@@ -131,7 +145,14 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
         ) : (
           <ul className="divide-y divide-surface-border/10">
             {logs.map((log) => (
-              <li key={log.id}>
+              <li key={log.id} className="group relative">
+                <button
+                  type="button"
+                  onClick={(e) => handleCopyLog(e, log)}
+                  className="absolute right-3 top-3 z-10 rounded-lg border border-surface-border/10 bg-surface px-2 py-1 text-xs font-medium text-ink-secondary opacity-0 shadow-sm transition hover:bg-surface-border/5 hover:text-ink-primary group-hover:opacity-100"
+                >
+                  {copiedLogId === log.id ? "Copié !" : "Copier"}
+                </button>
                 <button
                   type="button"
                   onClick={() => {

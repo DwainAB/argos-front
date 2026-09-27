@@ -8,7 +8,7 @@ import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
 type ApiAlert = {
   id: string;
   explanation: string;
-  fixLocation: "code" | "external";
+  fixLocation: "code" | "operational" | "external";
   status: "open" | "fix_proposed" | "fix_accepted" | "fix_rejected";
   resolvedAt: string | null;
   createdAt: string;
@@ -183,6 +183,17 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
             Ce problème ne se résout pas dans le code : suivez les instructions ci-dessus (section « Pourquoi cette
             alerte ? ») directement sur la plateforme concernée. Aucune correction par IA n&apos;est proposée pour ce
             type de problème.
+          </p>
+        </section>
+      )}
+
+      {alert.status === "open" && alert.fixLocation === "operational" && (
+        <section className="rounded-xl border border-surface-border/10 bg-surface-raised p-4">
+          <p className="text-sm text-ink-secondary">
+            Ce problème vient d&apos;un incident sur votre infrastructure (base de données, serveur, réseau interne),
+            pas d&apos;un bug dans le code : suivez les instructions ci-dessus (section « Pourquoi cette alerte ? »)
+            pour investiguer votre propre système. Aucune correction par IA n&apos;est proposée pour ce type de
+            problème.
           </p>
         </section>
       )}

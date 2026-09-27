@@ -7,6 +7,7 @@ import { useCurrentUser } from "@/components/dashboard/UserContext";
 import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton";
+import { GitlabConnectButton } from "@/components/dashboard/GitlabConnectButton";
 import { ProjectSharesSection } from "@/components/dashboard/ProjectSharesSection";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 
@@ -17,10 +18,20 @@ type GithubRepo = {
   defaultBranch: string;
 };
 
+type GitlabProject = {
+  id: number;
+  name: string;
+  fullPath: string;
+  defaultBranch: string;
+};
+
 export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const currentUser = useCurrentUser();
   const [githubInstallationId, setGithubInstallationId] = useState<string | null>(null);
   const [githubError, setGithubError] = useState<string | null>(null);
+
+  const [gitlabConnectionId, setGitlabConnectionId] = useState<string | null>(null);
+  const [gitlabError, setGitlabError] = useState<string | null>(null);
 
   const { projects, loading: projectsLoading, refetch: refetchProjects } = useProjects();
   const project = projects.find((p) => p.id === projectId);
@@ -34,9 +45,22 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [loadingBranches, setLoadingBranches] = useState(false);
 
+  const [gitlabProjects, setGitlabProjects] = useState<GitlabProject[] | null>(null);
+  const [loadingGitlabProjects, setLoadingGitlabProjects] = useState(false);
+  const [gitlabProjectsError, setGitlabProjectsError] = useState<string | null>(null);
+
+  const [selectedGitlabProjectId, setSelectedGitlabProjectId] = useState("");
+  const [gitlabBranches, setGitlabBranches] = useState<string[]>([]);
+  const [selectedGitlabBranch, setSelectedGitlabBranch] = useState("");
+  const [loadingGitlabBranches, setLoadingGitlabBranches] = useState(false);
+
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [savingGitlab, setSavingGitlab] = useState(false);
+  const [saveGitlabError, setSaveGitlabError] = useState<string | null>(null);
+  const [savedGitlab, setSavedGitlab] = useState(false);
 
   const [projectName, setProjectName] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -83,6 +107,68 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
       .catch((err) => console.error("Erreur lors du chargement des branches :", err))
       .finally(() => setLoadingBranches(false));
   }, [selectedRepo, githubInstallationId]);
+
+  useEffect(() => {
+    if (!gitlabConnectionId) return;
+
+    setLoadingGitlabProjects(true);
+    setGitlabProjectsError(null);
+
+    apiFetch(`/api/integrations/gitlab/projects?connectionId=${gitlabConnectionId}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error((await res.json()).error ?? "Erreur inconnue");
+        return res.json();
+      })
+      .then((data) => setGitlabProjects(data.projects))
+      .catch((err) => setGitlabProjectsError(err.message))
+      .finally(() => setLoadingGitlabProjects(false));
+  }, [gitlabConnectionId]);
+
+  const selectedGitlabProject = gitlabProjects?.find((p) => String(p.id) === selectedGitlabProjectId);
+
+  useEffect(() => {
+    if (!selectedGitlabProject || !gitlabConnectionId) return;
+
+    setLoadingGitlabBranches(true);
+    setGitlabBranches([]);
+
+    apiFetch(`/api/integrations/gitlab/branches?connectionId=${gitlabConnectionId}&gitlabProjectId=${selectedGitlabProject.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setGitlabBranches(data.branches ?? []);
+        setSelectedGitlabBranch(selectedGitlabProject.defaultBranch);
+      })
+      .catch((err) => console.error("Erreur lors du chargement des branches GitLab :", err))
+      .finally(() => setLoadingGitlabBranches(false));
+  }, [selectedGitlabProject, gitlabConnectionId]);
+
+  const handleSaveGitlab = async () => {
+    if (!gitlabConnectionId || !selectedGitlabProject || !selectedGitlabBranch) return;
+
+    setSavingGitlab(true);
+    setSaveGitlabError(null);
+
+    try {
+      const res = await apiFetch(`/api/projects/${projectId}/gitlab`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          connectionId: gitlabConnectionId,
+          gitlabProjectId: selectedGitlabProject.id,
+          repoFullPath: selectedGitlabProject.fullPath,
+          branch: selectedGitlabBranch,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
+      setSavedGitlab(true);
+    } catch (err) {
+      setSaveGitlabError(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setSavingGitlab(false);
+    }
+  };
 
   const handleSaveGithub = async () => {
     if (!githubInstallationId || !selectedRepoFullName || !selectedBranch) return;
@@ -269,6 +355,97 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
                   className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {saving ? "Enregistrement..." : "Associer ce dépôt"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </SettingsSection>
+
+      <SettingsSection
+        title="Dépôt GitLab"
+        description="Associez un dépôt GitLab à ce projet pour permettre à l'IA de proposer des corrections en cas d'erreur."
+      >
+        {gitlabError && (
+          <p className="mb-3 text-sm text-status-critical">
+            La connexion à GitLab a échoué ({gitlabError}). Réessayez.
+          </p>
+        )}
+
+        {project.gitlabRepo && !gitlabConnectionId ? (
+          <p className="text-sm text-status-good">
+            Connecté à <span className="font-mono">{project.gitlabRepo}</span> (branche{" "}
+            <span className="font-mono">{project.gitlabBranch}</span>).
+          </p>
+        ) : !gitlabConnectionId ? (
+          <GitlabConnectButton
+            onResult={(result) => {
+              if ("error" in result) {
+                setGitlabError(result.error);
+              } else {
+                setGitlabError(null);
+                setGitlabConnectionId(result.connectionId);
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
+          >
+            Connecter GitLab
+          </GitlabConnectButton>
+        ) : (
+          <div className="space-y-4">
+            {loadingGitlabProjects && <p className="text-sm text-ink-secondary">Chargement des projets...</p>}
+            {gitlabProjectsError && <p className="text-sm text-status-critical">{gitlabProjectsError}</p>}
+
+            {gitlabProjects && gitlabProjects.length === 0 && (
+              <p className="text-sm text-ink-secondary">Aucun projet GitLab accessible avec ce compte.</p>
+            )}
+
+            {gitlabProjects && gitlabProjects.length > 0 && (
+              <>
+                <SelectField
+                  label="Projet"
+                  id="gitlab-repo"
+                  value={selectedGitlabProjectId}
+                  onChange={(e) => setSelectedGitlabProjectId(e.target.value)}
+                >
+                  <option value="">Sélectionnez un projet</option>
+                  {gitlabProjects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.fullPath}
+                    </option>
+                  ))}
+                </SelectField>
+
+                {selectedGitlabProject && (
+                  <SelectField
+                    label="Branche"
+                    id="gitlab-branch"
+                    value={selectedGitlabBranch}
+                    onChange={(e) => setSelectedGitlabBranch(e.target.value)}
+                    disabled={loadingGitlabBranches}
+                  >
+                    {loadingGitlabBranches ? (
+                      <option>Chargement...</option>
+                    ) : (
+                      gitlabBranches.map((branch) => (
+                        <option key={branch} value={branch}>
+                          {branch}
+                        </option>
+                      ))
+                    )}
+                  </SelectField>
+                )}
+
+                {saveGitlabError && <p className="text-sm text-status-critical">{saveGitlabError}</p>}
+                {savedGitlab && <p className="text-sm text-status-good">Dépôt GitLab associé avec succès.</p>}
+
+                <button
+                  type="button"
+                  onClick={handleSaveGitlab}
+                  disabled={!selectedGitlabProjectId || !selectedGitlabBranch || savingGitlab}
+                  className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {savingGitlab ? "Enregistrement..." : "Associer ce dépôt"}
                 </button>
               </>
             )}
