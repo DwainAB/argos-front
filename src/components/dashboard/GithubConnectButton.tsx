@@ -35,7 +35,10 @@ export function GithubConnectButton({ projectId, disabled, onResult, children, c
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
-      if (event.origin !== window.location.origin) return;
+      // Le popup callback est servi par le backend (API_URL), pas par le frontend — comparer
+      // contre window.location.origin rejetait à tort le message (voir même correctif sur
+      // GitlabConnectButton.tsx/GitlabSignInButton.tsx).
+      if (event.origin !== new URL(API_URL).origin) return;
       if (!event.data || event.data.source !== "argos-github-install") return;
 
       const { error, installationId, projectId: returnedProjectId } = event.data;

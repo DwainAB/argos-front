@@ -10,7 +10,7 @@ import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 type ApiAlert = {
   id: string;
   explanation: string;
-  fixLocation: "code" | "external";
+  fixLocation: "code" | "operational" | "external";
   status: "open" | "fix_proposed" | "fix_accepted" | "fix_rejected";
   resolvedAt: string | null;
   createdAt: string;
@@ -36,6 +36,22 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
   const [loading, setLoading] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
   const [page, setPage] = useState(0);
+  const [copiedAlertId, setCopiedAlertId] = useState<string | null>(null);
+
+  async function handleCopyAlert(e: React.MouseEvent, alert: ApiAlert) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const text = `${alert.explanation}\n\n${alert.logEntry.rawMessage}`;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedAlertId(alert.id);
+      setTimeout(() => setCopiedAlertId((current) => (current === alert.id ? null : current)), 1500);
+    } catch (err) {
+      console.error("Erreur lors de la copie de l'alerte :", err);
+    }
+  }
 
   // Revenir à la première page quand on change de vue (alertes actives / historique).
   useEffect(() => {
@@ -111,7 +127,14 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
         ) : (
           <ul className="divide-y divide-surface-border/10">
             {alerts.map((alert) => (
-              <li key={alert.id}>
+              <li key={alert.id} className="group relative">
+                <button
+                  type="button"
+                  onClick={(e) => handleCopyAlert(e, alert)}
+                  className="absolute right-3 top-3 z-10 rounded-lg border border-surface-border/10 bg-surface px-2 py-1 text-xs font-medium text-ink-secondary opacity-0 shadow-sm transition hover:bg-surface-border/5 hover:text-ink-primary group-hover:opacity-100"
+                >
+                  {copiedAlertId === alert.id ? "Copié !" : "Copier"}
+                </button>
                 <Link
                   href={`/dashboard/projects/${params.id}/alerts/${alert.id}`}
                   className="flex w-full max-w-full items-start gap-3 overflow-hidden px-4 py-3 text-left text-sm transition hover:bg-surface-border/5"
@@ -123,6 +146,11 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
                       {alert.fixLocation === "external" && (
                         <span className="shrink-0 rounded-full border border-status-warning/20 bg-status-warning/10 px-2 py-0.5 text-xs font-medium text-status-warning">
                           Action externe requise
+                        </span>
+                      )}
+                      {alert.fixLocation === "operational" && (
+                        <span className="shrink-0 rounded-full border border-status-warning/20 bg-status-warning/10 px-2 py-0.5 text-xs font-medium text-status-warning">
+                          Incident d&apos;infrastructure
                         </span>
                       )}
                     </div>

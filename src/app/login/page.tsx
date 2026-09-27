@@ -7,7 +7,8 @@ import Image from "next/image";
 import { GithubIcon } from "@/components/icons/GithubIcon";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { ApiAuthError, loginWithGoogle, login } from "@/lib/auth";
+import { GitlabSignInButton } from "@/components/auth/GitlabSignInButton";
+import { ApiAuthError, loginWithGoogle, loginWithGitlab, login } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [gitlabSubmitting, setGitlabSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +51,25 @@ export default function LoginPage() {
 
   const handleGithubClick = () => {
     router.push("/dashboard");
+  };
+
+  const handleGitlabResult = async (result: { gitlabUserId: number; gitlabUserEmail: string | null } | { error: string }) => {
+    if ("error" in result) {
+      setError(`La connexion à GitLab a échoué (${result.error}). Réessayez.`);
+      return;
+    }
+
+    setGitlabSubmitting(true);
+    setError(null);
+
+    try {
+      await loginWithGitlab(result);
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof ApiAuthError ? err.message : "Impossible de vous connecter avec GitLab.");
+    } finally {
+      setGitlabSubmitting(false);
+    }
   };
 
   return (
@@ -131,6 +152,8 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <GoogleSignInButton onIdToken={handleGoogleIdToken} disabled={googleSubmitting} />
+
+            <GitlabSignInButton onResult={handleGitlabResult} disabled={gitlabSubmitting} />
 
             <button
               type="button"

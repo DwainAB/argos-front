@@ -7,6 +7,7 @@ import { SettingsSection } from "@/components/dashboard/SettingsSection";
 import { TextInput, SelectField } from "@/components/dashboard/FormField";
 import { Modal } from "@/components/dashboard/Modal";
 import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton";
+import { GitlabConnectButton } from "@/components/dashboard/GitlabConnectButton";
 
 type GithubRepo = {
   id: number;
@@ -15,13 +16,22 @@ type GithubRepo = {
   defaultBranch: string;
 };
 
+type GitlabProject = {
+  id: number;
+  name: string;
+  fullPath: string;
+  defaultBranch: string;
+};
+
 type HostingProvider = "railway" | "render";
+type CodeProvider = "github" | "gitlab";
 
 type RailwayCredentials = { projectToken: string; serviceId: string; environmentId: string };
 type RenderCredentials =
   | { apiKeyId: string; ownerId: string; resourceId: string }
   | { newApiKey: string; newApiKeyLabel?: string; ownerId: string; resourceId: string };
 type GithubSelection = { installationId: string; repoFullName: string; branch: string };
+type GitlabSelection = { connectionId: string; gitlabProjectId: number; repoFullPath: string; branch: string };
 
 function RailwayLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -57,9 +67,15 @@ export function NewProjectContent() {
   const [railwayCredentials, setRailwayCredentials] = useState<RailwayCredentials | null>(null);
   const [renderCredentials, setRenderCredentials] = useState<RenderCredentials | null>(null);
 
+  const [codeProvider, setCodeProvider] = useState<CodeProvider>("github");
+
   const [githubInstallationId, setGithubInstallationId] = useState<string | null>(null);
   const [githubError, setGithubError] = useState<string | null>(null);
   const [githubSelection, setGithubSelection] = useState<GithubSelection | null>(null);
+
+  const [gitlabConnectionId, setGitlabConnectionId] = useState<string | null>(null);
+  const [gitlabError, setGitlabError] = useState<string | null>(null);
+  const [gitlabSelection, setGitlabSelection] = useState<GitlabSelection | null>(null);
 
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -81,7 +97,8 @@ export function NewProjectContent() {
           projectName,
           railway: provider === "railway" ? railwayCredentials : undefined,
           render: provider === "render" ? renderCredentials : undefined,
-          github: githubSelection,
+          github: codeProvider === "github" ? githubSelection : undefined,
+          gitlab: codeProvider === "gitlab" ? gitlabSelection : undefined,
         }),
       });
       const data = await res.json();
@@ -161,39 +178,103 @@ export function NewProjectContent() {
 
       <SettingsSection
         title="Dépôt de code"
-        description="Connectez GitHub pour permettre à l'IA de proposer des corrections sur ce projet (facultatif)."
+        description="Connectez votre dépôt pour permettre à l'IA de proposer des corrections sur ce projet (facultatif)."
       >
-        {githubError && (
-          <p className="mb-3 text-sm text-status-critical">
-            La connexion à GitHub a échoué ({githubError}). Réessayez.
-          </p>
-        )}
-
-        <div className="flex flex-wrap gap-3">
-          <GithubConnectButton
-            projectId={null}
-            disabled={!provider}
-            onResult={(result) => {
-              if ("error" in result) {
-                setGithubError(result.error);
-              } else {
-                setGithubError(null);
-                setGithubInstallationId(result.installationId);
-              }
-            }}
-            className="inline-flex items-center gap-2 rounded-lg border border-surface-border/10 px-4 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5 disabled:cursor-not-allowed disabled:opacity-50"
+        <div className="mb-4 flex gap-2 rounded-lg bg-surface-border/5 p-1">
+          <button
+            type="button"
+            onClick={() => setCodeProvider("github")}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              codeProvider === "github" ? "bg-accent-500 text-white" : "text-ink-secondary hover:text-ink-primary"
+            }`}
           >
-            {githubSelection ? `GitHub connecté ✓ (${githubSelection.repoFullName})` : "Connecter GitHub"}
-          </GithubConnectButton>
+            GitHub
+          </button>
+          <button
+            type="button"
+            onClick={() => setCodeProvider("gitlab")}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              codeProvider === "gitlab" ? "bg-accent-500 text-white" : "text-ink-secondary hover:text-ink-primary"
+            }`}
+          >
+            GitLab
+          </button>
         </div>
 
-        {githubInstallationId && !githubSelection && (
-          <GithubRepoPicker
-            installationId={githubInstallationId}
-            onSaved={(repoFullName, branch) =>
-              setGithubSelection({ installationId: githubInstallationId, repoFullName, branch })
-            }
-          />
+        {codeProvider === "github" ? (
+          <>
+            {githubError && (
+              <p className="mb-3 text-sm text-status-critical">
+                La connexion à GitHub a échoué ({githubError}). Réessayez.
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-3">
+              <GithubConnectButton
+                projectId={null}
+                disabled={!provider}
+                onResult={(result) => {
+                  if ("error" in result) {
+                    setGithubError(result.error);
+                  } else {
+                    setGithubError(null);
+                    setGithubInstallationId(result.installationId);
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-surface-border/10 px-4 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {githubSelection ? `GitHub connecté ✓ (${githubSelection.repoFullName})` : "Connecter GitHub"}
+              </GithubConnectButton>
+            </div>
+
+            {githubInstallationId && !githubSelection && (
+              <GithubRepoPicker
+                installationId={githubInstallationId}
+                onSaved={(repoFullName, branch) =>
+                  setGithubSelection({ installationId: githubInstallationId, repoFullName, branch })
+                }
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {gitlabError && (
+              <p className="mb-3 text-sm text-status-critical">
+                La connexion à GitLab a échoué ({gitlabError}). Réessayez.
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-3">
+              <GitlabConnectButton
+                disabled={!provider}
+                onResult={(result) => {
+                  if ("error" in result) {
+                    setGitlabError(result.error);
+                  } else {
+                    setGitlabError(null);
+                    setGitlabConnectionId(result.connectionId);
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-surface-border/10 px-4 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {gitlabSelection ? `GitLab connecté ✓ (${gitlabSelection.repoFullPath})` : "Connecter GitLab"}
+              </GitlabConnectButton>
+            </div>
+
+            {gitlabConnectionId && !gitlabSelection && (
+              <GitlabRepoPicker
+                connectionId={gitlabConnectionId}
+                onSaved={(project, branch) =>
+                  setGitlabSelection({
+                    connectionId: gitlabConnectionId,
+                    gitlabProjectId: project.id,
+                    repoFullPath: project.fullPath,
+                    branch,
+                  })
+                }
+              />
+            )}
+          </>
         )}
       </SettingsSection>
 
@@ -335,23 +416,16 @@ function RenderConnectForm({ onConfirm }: { onConfirm: (credentials: RenderCrede
       .finally(() => setLoadingStoredKeys(false));
   }, []);
 
-  // La clé effectivement utilisée pour interroger l'API Render côté frontend (liste des
-  // services) : soit la clé stockée sélectionnée n'est PAS accessible en clair ici (jamais
-  // renvoyée par le backend), donc le mode liste n'est disponible que pour une clé nouvelle —
-  // une clé déjà stockée passe directement en mode manuel (owner/resource déjà connus par
-  // l'utilisateur la première fois, ou à ressaisir une fois).
   const usingStoredKey = keySource === "stored" && !!selectedStoredKeyId;
 
-  const handleFetchServices = async () => {
-    if (!newApiKey.trim()) return;
-
+  const handleFetchServices = async (query: string) => {
     setLoadingServices(true);
     setServicesError(null);
     setServices(null);
     setSelectedServiceId("");
 
     try {
-      const res = await apiFetch(`/api/integrations/render/services?apiKey=${encodeURIComponent(newApiKey)}`);
+      const res = await apiFetch(`/api/integrations/render/services?${query}`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
@@ -364,13 +438,22 @@ function RenderConnectForm({ onConfirm }: { onConfirm: (credentials: RenderCrede
     }
   };
 
+  // Dès qu'une clé déjà stockée est sélectionnée, on charge automatiquement la liste des
+  // services accessibles à cette clé (déchiffrée côté serveur, jamais renvoyée au client).
+  useEffect(() => {
+    if (usingStoredKey) {
+      handleFetchServices(`apiKeyId=${encodeURIComponent(selectedStoredKeyId)}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usingStoredKey, selectedStoredKeyId]);
+
   const selectedService = services?.find((s) => s.id === selectedServiceId);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const ownerId = usingStoredKey || mode === "manual" ? manualOwnerId : selectedService?.ownerId;
-    const resourceId = usingStoredKey || mode === "manual" ? manualResourceId : selectedService?.id;
+    const ownerId = !usingStoredKey && mode === "manual" ? manualOwnerId : selectedService?.ownerId;
+    const resourceId = !usingStoredKey && mode === "manual" ? manualResourceId : selectedService?.id;
     if (!ownerId || !resourceId) return;
 
     if (usingStoredKey) {
@@ -386,7 +469,7 @@ function RenderConnectForm({ onConfirm }: { onConfirm: (credentials: RenderCrede
   };
 
   const canSubmit = usingStoredKey
-    ? !!manualOwnerId && !!manualResourceId
+    ? !!selectedService
     : !newApiKey.trim()
       ? false
       : mode === "manual"
@@ -433,40 +516,29 @@ function RenderConnectForm({ onConfirm }: { onConfirm: (credentials: RenderCrede
             ))}
           </SelectField>
 
-          <div className="space-y-1 text-xs text-ink-secondary">
-            <p>
-              <strong>Resource ID</strong> : ouvrez votre service sur{" "}
-              <a
-                href="https://dashboard.render.com"
-                target="_blank"
-                rel="noreferrer"
-                className="underline hover:text-ink-primary"
-              >
-                dashboard.render.com
-              </a>
-              , l&apos;URL contient <code>srv-...</code>.
-            </p>
-            <p>
-              <strong>Owner ID</strong> : dans Account Settings → General, sous le nom du workspace actif.
-            </p>
-          </div>
+          {loadingServices && <p className="text-sm text-ink-secondary">Chargement des services...</p>}
 
-          <TextInput
-            label="Owner ID"
-            id="render-stored-owner-id"
-            placeholder="ex: tea-xxxxxxxxxxxxxxxxxxxx"
-            value={manualOwnerId}
-            onChange={(e) => setManualOwnerId(e.target.value)}
-            required
-          />
-          <TextInput
-            label="Resource ID (service)"
-            id="render-stored-resource-id"
-            placeholder="ex: srv-xxxxxxxxxxxxxxxxxxxx"
-            value={manualResourceId}
-            onChange={(e) => setManualResourceId(e.target.value)}
-            required
-          />
+          {servicesError && <p className="text-sm text-status-critical">{servicesError}</p>}
+
+          {services && services.length === 0 && (
+            <p className="text-sm text-ink-secondary">Aucun service trouvé sur ce compte Render.</p>
+          )}
+
+          {services && services.length > 0 && (
+            <SelectField
+              label="Service"
+              id="render-stored-service-select"
+              value={selectedServiceId}
+              onChange={(e) => setSelectedServiceId(e.target.value)}
+            >
+              <option value="">Sélectionnez un service</option>
+              {services.map((service) => (
+                <option key={service.id} value={service.id}>
+                  {service.name} ({service.type})
+                </option>
+              ))}
+            </SelectField>
+          )}
         </>
       ) : (
         <>
@@ -526,7 +598,7 @@ function RenderConnectForm({ onConfirm }: { onConfirm: (credentials: RenderCrede
             <>
               <button
                 type="button"
-                onClick={handleFetchServices}
+                onClick={() => handleFetchServices(`apiKey=${encodeURIComponent(newApiKey)}`)}
                 disabled={!newApiKey.trim() || loadingServices}
                 className="w-full rounded-lg border border-surface-border/10 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5 disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -721,6 +793,110 @@ function GithubRepoPicker({
             type="button"
             onClick={() => selectedRepoFullName && selectedBranch && onSaved(selectedRepoFullName, selectedBranch)}
             disabled={!selectedRepoFullName || !selectedBranch}
+            className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Associer ce dépôt
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+function GitlabRepoPicker({
+  connectionId,
+  onSaved,
+}: {
+  connectionId: string;
+  onSaved: (project: GitlabProject, branch: string) => void;
+}) {
+  const [projects, setProjects] = useState<GitlabProject[] | null>(null);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [projectsError, setProjectsError] = useState<string | null>(null);
+
+  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [branches, setBranches] = useState<string[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [loadingBranches, setLoadingBranches] = useState(false);
+
+  useEffect(() => {
+    apiFetch(`/api/integrations/gitlab/projects?connectionId=${connectionId}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error((await res.json()).error ?? "Erreur inconnue");
+        return res.json();
+      })
+      .then((data) => setProjects(data.projects))
+      .catch((err) => setProjectsError(err.message))
+      .finally(() => setLoadingProjects(false));
+  }, [connectionId]);
+
+  const selectedProject = projects?.find((p) => String(p.id) === selectedProjectId);
+
+  useEffect(() => {
+    if (!selectedProject) return;
+
+    setLoadingBranches(true);
+    setBranches([]);
+
+    apiFetch(`/api/integrations/gitlab/branches?connectionId=${connectionId}&gitlabProjectId=${selectedProject.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setBranches(data.branches ?? []);
+        setSelectedBranch(selectedProject.defaultBranch);
+      })
+      .catch((err) => console.error("Erreur lors du chargement des branches :", err))
+      .finally(() => setLoadingBranches(false));
+  }, [selectedProject, connectionId]);
+
+  return (
+    <div className="mt-4 space-y-4 border-t border-surface-border/10 pt-4">
+      {loadingProjects && <p className="text-sm text-ink-secondary">Chargement des projets...</p>}
+      {projectsError && <p className="text-sm text-status-critical">{projectsError}</p>}
+
+      {projects && projects.length === 0 && (
+        <p className="text-sm text-ink-secondary">Aucun projet GitLab accessible avec ce compte.</p>
+      )}
+
+      {projects && projects.length > 0 && (
+        <>
+          <SelectField
+            label="Projet"
+            id="new-project-gitlab-repo"
+            value={selectedProjectId}
+            onChange={(e) => setSelectedProjectId(e.target.value)}
+          >
+            <option value="">Sélectionnez un projet</option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.fullPath}
+              </option>
+            ))}
+          </SelectField>
+
+          {selectedProject && (
+            <SelectField
+              label="Branche"
+              id="new-project-gitlab-branch"
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              disabled={loadingBranches}
+            >
+              {loadingBranches ? (
+                <option>Chargement...</option>
+              ) : (
+                branches.map((branch) => (
+                  <option key={branch} value={branch}>
+                    {branch}
+                  </option>
+                ))
+              )}
+            </SelectField>
+          )}
+
+          <button
+            type="button"
+            onClick={() => selectedProject && selectedBranch && onSaved(selectedProject, selectedBranch)}
+            disabled={!selectedProject || !selectedBranch}
             className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Associer ce dépôt

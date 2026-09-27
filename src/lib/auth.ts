@@ -69,6 +69,16 @@ export async function loginWithGoogle(idToken: string) {
   return data.user as CurrentUser;
 }
 
+export async function loginWithGitlab(params: { gitlabUserId: number; gitlabUserEmail: string | null }) {
+  const res = await apiFetch("/api/auth/gitlab", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.user as CurrentUser;
+}
+
 export async function updatePhone(phone: string) {
   const res = await apiFetch("/api/auth/me", {
     method: "PATCH",

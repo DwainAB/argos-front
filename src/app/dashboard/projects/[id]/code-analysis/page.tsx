@@ -118,7 +118,7 @@ export default function ProjectCodeAnalysisPage({ params }: { params: { id: stri
     }
   }
 
-  const hasGithub = !!project?.githubRepo;
+  const hasRepo = !!(project?.githubRepo || project?.gitlabRepo);
 
   return (
     <div className="space-y-6">
@@ -131,10 +131,10 @@ export default function ProjectCodeAnalysisPage({ params }: { params: { id: stri
         vous propose une recommandation pour chacun.
       </p>
 
-      {!hasGithub ? (
+      {!hasRepo ? (
         <p className="rounded-xl border border-surface-border/10 bg-surface-raised p-4 text-sm text-ink-secondary">
-          Ce projet n'a pas de dépôt GitHub connecté — connectez-en un depuis les intégrations pour lancer une
-          analyse.
+          Ce projet n'a pas de dépôt GitHub ou GitLab connecté — connectez-en un depuis les intégrations pour lancer
+          une analyse.
         </p>
       ) : (
         <section className="space-y-3 rounded-xl border border-surface-border/10 bg-surface-raised p-4">

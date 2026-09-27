@@ -8,6 +8,8 @@ export type ApiProject = {
   name: string;
   githubRepo: string | null;
   githubBranch: string | null;
+  gitlabRepo: string | null;
+  gitlabBranch: string | null;
   railwayServiceId: string | null;
   railwayEnvironmentId: string | null;
   renderOwnerId: string | null;
