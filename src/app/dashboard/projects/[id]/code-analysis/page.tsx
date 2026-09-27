@@ -5,6 +5,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
+import { ActorLabel, type Actor } from "@/components/dashboard/ActorLabel";
 
 type CodeAnalysisScores = {
   security: number;
@@ -21,6 +22,7 @@ type ApiCodeAnalysis = {
   findings: unknown[] | null;
   createdAt: string;
   completedAt: string | null;
+  startedBy: Actor;
 };
 
 type Estimate = { filesToAnalyze: number; estimatedSeconds: number };
@@ -199,6 +201,12 @@ export default function ProjectCodeAnalysisPage({ params }: { params: { id: stri
                     </p>
                     <p className="mt-1 text-xs text-ink-muted">
                       {new Date(analysis.createdAt).toLocaleString("fr-FR")}
+                      {analysis.startedBy && (
+                        <>
+                          {" "}
+                          · lancée par <ActorLabel actor={analysis.startedBy} />
+                        </>
+                      )}
                     </p>
                   </div>
                   {analysis.status === "done" && analysis.scores && (

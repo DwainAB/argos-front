@@ -10,6 +10,7 @@ import { GithubConnectButton } from "@/components/dashboard/GithubConnectButton"
 import { GitlabConnectButton } from "@/components/dashboard/GitlabConnectButton";
 import { ProjectSharesSection } from "@/components/dashboard/ProjectSharesSection";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
+import { ActorLabel } from "@/components/dashboard/ActorLabel";
 
 type GithubRepo = {
   id: number;
@@ -242,6 +243,11 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
           <ProjectOwnerBadge project={project} />
         </div>
         <p className="mt-1 text-sm text-ink-secondary">Configuration de {project.name}.</p>
+        {project.createdBy && (
+          <p className="mt-1 text-xs text-ink-muted">
+            Créé par <ActorLabel actor={project.createdBy} /> le {new Date(project.createdAt).toLocaleDateString("fr-FR")}
+          </p>
+        )}
       </div>
 
       <SettingsSection title="Informations générales" description="Nom du projet.">
