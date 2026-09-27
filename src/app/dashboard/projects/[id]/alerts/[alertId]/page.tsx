@@ -16,6 +16,7 @@ type ApiAlert = {
   proposedOldCode: string | null;
   proposedNewCode: string | null;
   proposedExplanation: string | null;
+  proposedCommitMessage: string | null;
   pullRequestUrl: string | null;
   logEntry: {
     id: string;
@@ -36,6 +37,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
   const [fixError, setFixError] = useState<string | null>(null);
   const [togglingResolved, setTogglingResolved] = useState(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
+  const [commitMessage, setCommitMessage] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -45,7 +47,10 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
         const res = await apiFetch(`/api/alerts/${params.alertId}`);
         if (!res.ok) throw new Error("Réponse non OK");
         const data = await res.json();
-        if (!cancelled) setAlert(data.alert);
+        if (!cancelled) {
+          setAlert(data.alert);
+          setCommitMessage(data.alert?.proposedCommitMessage ?? "");
+        }
       } catch (err) {
         console.error("Erreur lors du chargement de l'alerte :", err);
         if (!cancelled) setLoadError(true);
@@ -67,6 +72,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
       setAlert(data.alert);
+      setCommitMessage(data.alert?.proposedCommitMessage ?? "");
     } catch (err) {
       console.error("Erreur lors de la demande de correction :", err);
       setFixError("L'IA n'a pas pu proposer de correctif fiable pour cette alerte.");
@@ -101,7 +107,12 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
     setFixError(null);
 
     try {
-      const res = await apiFetch(`/api/alerts/${alert.id}/fix/${decision}`, { method: "POST" });
+      const res = await apiFetch(`/api/alerts/${alert.id}/fix/${decision}`, {
+        method: "POST",
+        ...(decision === "accept"
+          ? { headers: { "Content-Type": "application/json" }, body: JSON.stringify({ commitMessage }) }
+          : {}),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur inconnue");
       setAlert(data.alert);
@@ -240,16 +251,28 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
           </div>
 
           {alert.status === "fix_proposed" && (
-            <div>
-              <p className="mb-2 text-sm text-ink-primary">Voulez-vous que l'IA fasse une pull request ?</p>
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="commit-message" className="mb-1 block text-xs text-ink-muted">
+                  Message de commit
+                </label>
+                <textarea
+                  id="commit-message"
+                  value={commitMessage}
+                  onChange={(e) => setCommitMessage(e.target.value)}
+                  rows={2}
+                  className="w-full resize-none rounded-lg border border-surface-border/10 bg-surface p-3 font-mono text-xs text-ink-primary focus:border-accent-500/50 focus:outline-none"
+                />
+              </div>
+
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => handleDecideFix("accept")}
-                  disabled={decidingFix}
+                  disabled={decidingFix || !commitMessage.trim()}
                   className="rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Accepter
+                  {decidingFix ? "Création en cours..." : "Créer une Pull Request"}
                 </button>
                 <button
                   type="button"
