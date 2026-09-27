@@ -6,6 +6,7 @@ import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
+import { ActorLabel, type Actor } from "@/components/dashboard/ActorLabel";
 
 type ApiAlert = {
   id: string;
@@ -13,6 +14,7 @@ type ApiAlert = {
   fixLocation: "code" | "operational" | "external";
   status: "open" | "fix_proposed" | "fix_accepted" | "fix_rejected";
   resolvedAt: string | null;
+  resolvedBy: Actor;
   createdAt: string;
   logEntry: {
     id: string;
@@ -155,6 +157,11 @@ export default function ProjectAlertsPage({ params }: { params: { id: string } }
                       )}
                     </div>
                     <p className="mt-1 truncate font-mono text-xs text-ink-muted">{alert.logEntry.rawMessage}</p>
+                    {showHistory && alert.resolvedBy && (
+                      <p className="mt-1 text-xs text-ink-muted">
+                        Traitée par <ActorLabel actor={alert.resolvedBy} />
+                      </p>
+                    )}
                   </div>
                   <span className="flex shrink-0 flex-col items-end text-xs text-ink-muted">
                     <span>

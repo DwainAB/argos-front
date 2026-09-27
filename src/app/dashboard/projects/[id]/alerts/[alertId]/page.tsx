@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-fetch";
 import { CategoryBadge } from "@/components/dashboard/CategoryBadge";
+import { ActorLabel, type Actor } from "@/components/dashboard/ActorLabel";
 
 type ApiAlert = {
   id: string;
@@ -11,6 +12,8 @@ type ApiAlert = {
   fixLocation: "code" | "operational" | "external";
   status: "open" | "fix_proposed" | "fix_accepted" | "fix_rejected";
   resolvedAt: string | null;
+  resolvedBy: Actor;
+  fixDecidedBy: Actor;
   createdAt: string;
   proposedFilePath: string | null;
   proposedOldCode: string | null;
@@ -148,6 +151,12 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
             {alert.resolvedAt && (
               <span className="rounded-full border border-status-good/20 bg-status-good/10 px-2 py-0.5 text-xs font-medium text-status-good">
                 Traitée le {new Date(alert.resolvedAt).toLocaleString("fr-FR")}
+                {alert.resolvedBy && (
+                  <>
+                    {" "}
+                    par <ActorLabel actor={alert.resolvedBy} />
+                  </>
+                )}
               </span>
             )}
           </div>
@@ -289,7 +298,13 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
 
           {alert.status === "fix_accepted" && alert.pullRequestUrl && (
             <p className="rounded-lg border border-status-good/20 bg-status-good/5 p-3 text-sm text-ink-primary">
-              Accepté — pull request créée :{" "}
+              Accepté{alert.fixDecidedBy && (
+                <>
+                  {" "}
+                  par <ActorLabel actor={alert.fixDecidedBy} />
+                </>
+              )}{" "}
+              — pull request créée :{" "}
               <a href={alert.pullRequestUrl} target="_blank" rel="noreferrer" className="underline">
                 {alert.pullRequestUrl}
               </a>
@@ -298,7 +313,12 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
 
           {alert.status === "fix_rejected" && (
             <p className="rounded-lg border border-surface-border/10 bg-surface p-3 text-sm text-ink-secondary">
-              Refusé — aucune pull request n'a été créée.
+              Refusé{alert.fixDecidedBy && (
+                <>
+                  {" "}
+                  par <ActorLabel actor={alert.fixDecidedBy} />
+                </>
+              )} — aucune pull request n'a été créée.
             </p>
           )}
         </section>

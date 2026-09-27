@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-fetch";
 import { SeverityBadge } from "@/components/dashboard/SeverityBadge";
+import { ActorLabel, type Actor } from "@/components/dashboard/ActorLabel";
 
 type CodeAnalysisScores = {
   security: number;
@@ -23,7 +24,7 @@ type CodeFinding = {
   description: string;
   recommendation: string;
   status: FindingStatus;
-  resolvedBy: { userId: string; firstName: string; lastName: string } | null;
+  resolvedBy: Actor;
   resolvedAt: string | null;
 };
 
@@ -36,6 +37,7 @@ type ApiCodeAnalysis = {
   errorMessage: string | null;
   createdAt: string;
   completedAt: string | null;
+  startedBy: Actor;
 };
 
 const SCORE_LABELS: Record<keyof CodeAnalysisScores, string> = {
@@ -124,7 +126,7 @@ function FindingRow({
 
         {finding.status === "resolved" && finding.resolvedBy && (
           <p className="text-xs text-ink-muted">
-            Corrigé par {finding.resolvedBy.firstName} {finding.resolvedBy.lastName}
+            Corrigé par <ActorLabel actor={finding.resolvedBy} />
             {finding.resolvedAt && ` le ${new Date(finding.resolvedAt).toLocaleString("fr-FR")}`}
           </p>
         )}
@@ -253,6 +255,11 @@ export default function CodeAnalysisDetailPage({ params }: { params: { id: strin
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <h1 className="text-xl font-semibold text-ink-primary">Analyse du {new Date(analysis.createdAt).toLocaleString("fr-FR")}</h1>
         </div>
+        {analysis.startedBy && (
+          <p className="mt-1 text-xs text-ink-muted">
+            Lancée par <ActorLabel actor={analysis.startedBy} />
+          </p>
+        )}
       </div>
 
       {analysis.status === "running" && (

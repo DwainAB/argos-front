@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "./api-fetch";
+import type { Actor } from "@/components/dashboard/ActorLabel";
 
 export type ApiProject = {
   id: string;
@@ -15,6 +16,7 @@ export type ApiProject = {
   renderOwnerId: string | null;
   renderResourceId: string | null;
   createdAt: string;
+  createdBy: Actor;
 
   user: { accountType: "personal" | "organization"; organizationName: string | null };
 };
