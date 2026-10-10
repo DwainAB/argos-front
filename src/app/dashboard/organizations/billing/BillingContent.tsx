@@ -11,10 +11,10 @@ import {
   type DowngradePreview,
   type PlanChangePreview,
   getDowngradePreview,
-  getDowngradeToSoloPortalUrl,
   getUpgradeToBusinessPortalUrl,
   openBillingPortal,
   previewPlanChange,
+  scheduleDowngradeToSolo,
   useSubscription,
 } from "@/lib/subscription";
 
@@ -195,19 +195,23 @@ function UpgradeToBusinessModal({ open, onClose }: { open: boolean; onClose: () 
   );
 }
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
 function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [preview, setPreview] = useState<DowngradePreview | null>(null);
   const [loadingPreview, setLoadingPreview] = useState(true);
-  const [priceChange, setPriceChange] = useState<PlanChangePreview | null>(null);
-  const [loadingPrice, setLoadingPrice] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [scheduledFor, setScheduledFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
 
+    setScheduledFor(null);
     setLoadingPreview(true);
     getDowngradePreview()
       .then((data) => {
@@ -217,16 +221,6 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
       })
       .catch((err) => !cancelled && setError(err instanceof Error ? err.message : "Erreur inconnue"))
       .finally(() => !cancelled && setLoadingPreview(false));
-
-    setLoadingPrice(true);
-    previewPlanChange("solo")
-      .then((data) => !cancelled && setPriceChange(data))
-      .catch(() => {
-        // Le montant est un complément d'information, pas bloquant : si son calcul échoue
-        // (ex: abonnement pas encore actif), on laisse simplement le changement de plan
-        // continuer sans afficher de chiffre plutôt que de bloquer tout le flux dessus.
-      })
-      .finally(() => !cancelled && setLoadingPrice(false));
 
     return () => {
       cancelled = true;
@@ -247,13 +241,33 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
     setError(null);
 
     try {
-      const portalUrl = await getDowngradeToSoloPortalUrl(preview.requiresProjectSelection ? selected : undefined);
-      window.location.href = portalUrl;
+      const { effectiveAt } = await scheduleDowngradeToSolo(preview.requiresProjectSelection ? selected : undefined);
+      setScheduledFor(effectiveAt);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de passer au plan Solo.");
+    } finally {
       setSubmitting(false);
     }
   };
+
+  if (scheduledFor) {
+    return (
+      <Modal open={open} onClose={onClose} title="Passage au plan Solo programmé">
+        <p className="text-sm text-ink-secondary">
+          Votre abonnement Business reste actif jusqu'au {formatDate(scheduledFor)}. À cette date, il basculera
+          automatiquement vers le plan Solo, sans frais ni crédit — les projets non sélectionnés seront alors
+          définitivement supprimés avec tout leur historique.
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-4 w-full rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"
+        >
+          Fermer
+        </button>
+      </Modal>
+    );
+  }
 
   return (
     <Modal open={open} onClose={onClose} title="Passer au plan Solo">
@@ -269,8 +283,9 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
           {preview?.requiresProjectSelection ? (
             <>
               <p className="text-sm text-ink-secondary">
-                Le plan Solo est limité à 3 projets. Choisissez ceux à garder actifs — les autres seront masqués et
-                réapparaîtront automatiquement si vous repassez au plan Business.
+                Le plan Solo est limité à 3 projets. Choisissez ceux à garder actifs — les autres seront
+                définitivement supprimés avec tout leur historique (logs, alertes, analyses) à la fin de votre
+                période de facturation en cours.
               </p>
               <ul className="space-y-2">
                 {preview.activeProjects.map((project) => (
@@ -294,8 +309,10 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
               Votre organisation sera dissoute et l'abonnement repassera à votre compte personnel.
             </p>
           )}
-          <p className="text-xs text-ink-muted">Vous allez être redirigé vers Stripe pour finaliser le changement.</p>
-          <PriceChangeNotice preview={priceChange} loading={loadingPrice} />
+          <p className="text-xs text-ink-muted">
+            Vous conservez le plan Business jusqu'à la fin de votre période de facturation en cours — aucun montant
+            supplémentaire ne sera prélevé, aucun crédit ne sera accordé.
+          </p>
           {error && <p className="text-sm text-status-critical">{error}</p>}
           <button
             type="button"
@@ -303,7 +320,7 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
             disabled={submitting || (preview?.requiresProjectSelection && selected.length === 0)}
             className="w-full rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Redirection vers Stripe..." : "Continuer vers Stripe"}
+            {submitting ? "Programmation en cours..." : "Confirmer le passage au plan Solo"}
           </button>
         </div>
       )}
@@ -353,6 +370,8 @@ function PlanSection() {
 
   return (
     <SettingsSection title="Plan actuel">
+      {/* Avertissement paiement en retard / blocage : affiché globalement sur toutes les
+          pages du dashboard, voir PaymentGraceBanner dans dashboard/layout.tsx. */}
       <div className="flex items-center justify-between rounded-lg border border-surface-border/10 bg-surface px-4 py-3">
         <div>
           <p className="text-sm text-ink-primary">Plan {PLAN_LABEL[subscription.plan]}</p>

@@ -14,6 +14,8 @@ export type CurrentUser = {
   organizationRole: "admin" | "user" | null;
   subscriptionStatus: string | null;
   hasActiveSubscription: boolean;
+  subscriptionBlocked: boolean;
+  paymentGraceDeadline: string | null;
 };
 
 export class ApiAuthError extends Error {}
