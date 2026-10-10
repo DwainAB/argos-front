@@ -7,8 +7,15 @@ export type SubscriptionInfo = {
   plan: "solo" | "business";
   status: string;
   currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  // true une fois le délai de grâce de paiement écoulé (voir billing-grace-period.job.ts
+  // côté backend) — à ce stade, le streaming de logs est arrêté, pas seulement le statut
+  // affiché. paymentGraceDeadline est la date limite tant que blocked est encore false.
+  blocked: boolean;
+  paymentGraceDeadline: string | null;
   sms: { used: number; limit: number };
   fixes: { used: number; limit: number };
+  codeAnalyses: { used: number; limit: number };
 };
 
 export async function startCheckout(): Promise<string> {
@@ -59,7 +66,10 @@ export async function getUpgradeToBusinessPortalUrl(organizationName: string): P
   return data.portalUrl as string;
 }
 
-export async function getDowngradeToSoloPortalUrl(keepProjectIds?: string[]): Promise<string> {
+// Le downgrade est programmé pour la fin de la période de facturation en cours, sans
+// proration (voir plan-change.service.ts côté backend) : pas de redirection vers Stripe, la
+// date à laquelle le changement prendra effet est renvoyée directement.
+export async function scheduleDowngradeToSolo(keepProjectIds?: string[]): Promise<{ effectiveAt: string }> {
   const res = await apiFetch("/api/subscription/downgrade-to-solo", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -67,7 +77,7 @@ export async function getDowngradeToSoloPortalUrl(keepProjectIds?: string[]): Pr
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error ?? "Impossible de passer au plan Solo.");
-  return data.portalUrl as string;
+  return data as { effectiveAt: string };
 }
 
 export function useSubscription() {

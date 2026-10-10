@@ -7,6 +7,7 @@ import { SidebarProvider } from "@/components/dashboard/SidebarContext";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { UserProvider } from "@/components/dashboard/UserContext";
+import { PaymentGraceBanner } from "@/components/dashboard/PaymentGraceBanner";
 import { getCurrentUser, type CurrentUser } from "@/lib/auth";
 
 // Seule page accessible sans abonnement actif — sert justement à en démarrer un.
@@ -70,6 +71,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <Sidebar />
           <div className="flex min-h-screen min-w-0 flex-1 flex-col">
             <Header />
+            <PaymentGraceBanner />
             <main className="min-w-0 flex-1 px-6 py-6">{children}</main>
           </div>
         </div>
