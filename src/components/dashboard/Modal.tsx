@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type ModalProps = {
   open: boolean;
@@ -11,6 +12,15 @@ type ModalProps = {
 };
 
 export function Modal({ open, onClose, title, children }: ModalProps) {
+  // Rendu via portail dans document.body plutôt qu'à l'endroit où <Modal> est appelé dans
+  // l'arbre React : un ancêtre en position sticky/relative (ex: Sidebar.tsx) crée son propre
+  // contexte d'empilement, dans lequel le z-index du modal n'est comparé qu'aux autres
+  // enfants de cet ancêtre — un graphique ou tout autre élément positionné ailleurs dans la
+  // page peut alors passer au-dessus malgré un z-index plus élevé ici. document.body n'existe
+  // pas côté serveur, d'où ce mounted pour ne monter le portail qu'après l'hydratation.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (!open) return;
     function handleKey(e: KeyboardEvent) {
@@ -20,9 +30,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-30 flex items-center justify-center p-4">
       <button
         type="button"
@@ -46,6 +56,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         </div>
         <div className="px-5 py-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
