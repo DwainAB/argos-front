@@ -173,6 +173,18 @@ export default function LoginPage() {
 
             <GithubSignInButton onResult={handleGithubResult} disabled={githubSubmitting} />
           </div>
+
+          <p className="mt-2 text-center text-xs text-ink-muted">
+            Déjà connecté à un autre compte GitLab ou GitHub ? Déconnectez-vous d&apos;abord sur{" "}
+            <a href="https://gitlab.com/users/sign_out" target="_blank" rel="noreferrer" className="underline">
+              gitlab.com
+            </a>{" "}
+            ou{" "}
+            <a href="https://github.com/logout" target="_blank" rel="noreferrer" className="underline">
+              github.com
+            </a>{" "}
+            pour pouvoir en choisir un autre ici.
+          </p>
         </div>
 
         <p className="mt-6 text-center text-sm text-ink-secondary">
