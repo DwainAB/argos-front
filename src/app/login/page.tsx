@@ -175,12 +175,16 @@ export default function LoginPage() {
           </div>
 
           <p className="mt-2 text-center text-xs text-ink-muted">
-            Déjà connecté à un autre compte GitLab ou GitHub ? Déconnectez-vous d&apos;abord sur{" "}
-            <a href="https://gitlab.com/users/sign_out" target="_blank" rel="noreferrer" className="underline">
+            Déjà connecté à un autre compte GitLab ou GitHub ? Déconnectez-vous d&apos;abord depuis{" "}
+            {/* GitLab a retiré le lien de déconnexion direct en GET (/users/sign_out exige
+                désormais un POST avec jeton CSRF, inaccessible depuis un simple lien externe) :
+                on pointe vers la page d'accueil du compte, où le bouton de déconnexion reste
+                disponible dans l'interface normale. */}
+            <a href="https://gitlab.com" target="_blank" rel="noreferrer" className="underline">
               gitlab.com
             </a>{" "}
             ou{" "}
-            <a href="https://github.com/logout" target="_blank" rel="noreferrer" className="underline">
+            <a href="https://github.com/settings/profile" target="_blank" rel="noreferrer" className="underline">
               github.com
             </a>{" "}
             pour pouvoir en choisir un autre ici.
