@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type SidePanelProps = {
   open: boolean;
@@ -11,6 +12,11 @@ type SidePanelProps = {
 };
 
 export function SidePanel({ open, onClose, title, children }: SidePanelProps) {
+  // Voir Modal.tsx pour le détail : un portail évite qu'un ancêtre sticky/relative (ex:
+  // Sidebar.tsx) ne piège ce panneau dans son propre contexte d'empilement.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (!open) return;
     function handleKey(e: KeyboardEvent) {
@@ -20,9 +26,9 @@ export function SidePanel({ open, onClose, title, children }: SidePanelProps) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-30 flex justify-end">
       <button
         type="button"
@@ -46,6 +52,7 @@ export function SidePanel({ open, onClose, title, children }: SidePanelProps) {
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
