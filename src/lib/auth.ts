@@ -81,6 +81,16 @@ export async function loginWithGitlab(params: { gitlabUserId: number; gitlabUser
   return data.user as CurrentUser;
 }
 
+export async function loginWithGithub(params: { githubUserId: number; githubUserEmail: string | null }) {
+  const res = await apiFetch("/api/auth/github", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  const data = await parseJsonOrThrow(res);
+  return data.user as CurrentUser;
+}
+
 export async function updatePhone(phone: string) {
   const res = await apiFetch("/api/auth/me", {
     method: "PATCH",
