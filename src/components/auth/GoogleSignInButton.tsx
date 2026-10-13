@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { GOOGLE_CLIENT_ID } from "@/lib/config";
@@ -26,10 +26,8 @@ export function GoogleSignInButton(props: { onIdToken: (idToken: string) => void
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   // Le <Script> se charge de façon asynchrone : impossible de dessiner le bouton avant que
-  // window.google existe réellement. handleScriptLoad se déclenche exactement à ce moment
-  // (y compris si le script était déjà en cache et se charge quasi instantanément), ce qui
-  // déclenche un re-render et le rendu effectif du bouton juste après.
-  const handleScriptLoad = useCallback(() => {
+  // window.google existe réellement.
+  const handleScriptReady = useCallback(() => {
     if (!GOOGLE_CLIENT_ID || !buttonRef.current || !window.google) return;
 
     window.google.accounts.id.initialize({
@@ -48,6 +46,17 @@ export function GoogleSignInButton(props: { onIdToken: (idToken: string) => void
     setScriptLoaded(true);
   }, [onIdToken]);
 
+  // next/script n'exécute l'événement de chargement qu'une seule fois par document (premier
+  // chargement du tag <script> dans le DOM) : une navigation client-side ultérieure vers une
+  // page qui remonte ce composant (ex: accueil -> /login via <Link>, sans rechargement complet)
+  // ne redéclenche jamais onLoad, laissant le bouton désactivé indéfiniment. onReady (ci-dessous,
+  // sur <Script>) couvre ce cas, mais si le script est déjà chargé AVANT même le premier rendu de
+  // ce montage (onReady peut ne pas se déclencher non plus dans ce cas précis selon la version),
+  // ce useEffect sert de filet de sécurité en vérifiant directement window.google.
+  useEffect(() => {
+    if (window.google) handleScriptReady();
+  }, [handleScriptReady]);
+
   if (!GOOGLE_CLIENT_ID) {
     // Pas de Client ID configuré (dev sans .env rempli) : bouton visuel désactivé plutôt
     // que de planter silencieusement.
@@ -65,7 +74,7 @@ export function GoogleSignInButton(props: { onIdToken: (idToken: string) => void
 
   return (
     <>
-      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onLoad={handleScriptLoad} />
+      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onReady={handleScriptReady} />
       <div ref={buttonRef} className={disabled ? "pointer-events-none opacity-50" : ""} />
       {!scriptLoaded && (
         <button
