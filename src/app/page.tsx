@@ -117,15 +117,15 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl px-6 pb-8 pt-16 text-center sm:pt-24">
           <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-surface-border/10 bg-surface-raised px-3 py-1 text-xs font-medium text-ink-secondary">
             <span className="animate-pulse-ring h-1.5 w-1.5 rounded-full bg-accent-400" />
-            L'intelligence artificielle qui veille sur vos serveurs
+            L&apos;intelligence artificielle qui veille sur vos serveurs
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-ink-primary sm:text-5xl">
             Vos serveurs, sous surveillance permanente
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-ink-secondary sm:text-lg">
             Argos surveille vos serveurs en continu, vous alerte à la seconde où un problème
-            survient, et vous explique clairement ce qu'il se passe. Une tranquillité d'esprit
-            que vous n'aviez pas encore.
+            survient, et vous explique clairement ce qu&apos;il se passe. Une tranquillité d&apos;esprit
+            que vous n&apos;aviez pas encore.
           </p>
           <div className="mt-8 flex items-center justify-center">
             <Link
@@ -231,7 +231,7 @@ export default function HomePage() {
             Questions fréquentes
           </h2>
           <p className="mt-3 text-sm text-ink-secondary sm:text-base">
-            Tout ce qu'il faut savoir avant de connecter vos premiers serveurs.
+            Tout ce qu&apos;il faut savoir avant de connecter vos premiers serveurs.
           </p>
         </div>
 

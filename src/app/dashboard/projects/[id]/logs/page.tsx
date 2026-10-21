@@ -140,7 +140,7 @@ export default function ProjectLogsPage({ params }: { params: { id: string } }) 
           <p className="px-4 py-6 text-center text-sm text-ink-secondary">Chargement des logs...</p>
         ) : logs.length === 0 ? (
           <p className="px-4 py-6 text-center text-sm text-ink-secondary">
-            Aucun log reçu pour l'instant. Les nouveaux logs apparaîtront ici automatiquement.
+            Aucun log reçu pour l&apos;instant. Les nouveaux logs apparaîtront ici automatiquement.
           </p>
         ) : (
           <ul className="divide-y divide-surface-border/10">

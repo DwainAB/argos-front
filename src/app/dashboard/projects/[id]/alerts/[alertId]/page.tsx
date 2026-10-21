@@ -128,7 +128,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
   }
 
   if (loading) {
-    return <p className="text-sm text-ink-secondary">Chargement de l'alerte...</p>;
+    return <p className="text-sm text-ink-secondary">Chargement de l&apos;alerte...</p>;
   }
 
   if (loadError || !alert) {
@@ -238,7 +238,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
 
           {alert.proposedExplanation && (
             <div>
-              <p className="mb-1 text-xs text-ink-muted">Explication de l'IA</p>
+              <p className="mb-1 text-xs text-ink-muted">Explication de l&apos;IA</p>
               <p className="rounded-lg border border-accent-500/20 bg-accent-500/5 p-3 text-sm text-ink-primary">
                 {alert.proposedExplanation}
               </p>
@@ -318,7 +318,7 @@ export default function AlertDetailPage({ params }: { params: { id: string; aler
                   {" "}
                   par <ActorLabel actor={alert.fixDecidedBy} />
                 </>
-              )} — aucune pull request n'a été créée.
+              )} — aucune pull request n&apos;a été créée.
             </p>
           )}
         </section>

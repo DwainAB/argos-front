@@ -95,7 +95,7 @@ export default function DashboardOverviewPage() {
             <p className="px-4 py-6 text-center text-sm text-ink-secondary">Chargement des projets...</p>
           ) : projects.length === 0 ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm text-ink-secondary">Vous n'avez actuellement aucun projet connecté.</p>
+              <p className="text-sm text-ink-secondary">Vous n&apos;avez actuellement aucun projet connecté.</p>
               <Link
                 href="/dashboard/projects/new"
                 className="mt-3 inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-600"

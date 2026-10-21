@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
         <div className="rounded-xl border border-surface-border/10 bg-surface-raised/90 p-6 shadow-2xl shadow-accent-500/5 backdrop-blur">
           {sent ? (
             <p className="text-sm text-ink-secondary">
-              Si un compte existe avec cet email, un lien de réinitialisation vient d'être envoyé. Pensez à vérifier
+              Si un compte existe avec cet email, un lien de réinitialisation vient d&apos;être envoyé. Pensez à vérifier
               vos spams.
             </p>
           ) : (

@@ -38,7 +38,7 @@ export default function OrganizationSignupPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="organizationName" className="mb-1 block text-sm text-ink-secondary">
-              Nom de l'organisation
+              Nom de l&apos;organisation
             </label>
             <input
               id="organizationName"

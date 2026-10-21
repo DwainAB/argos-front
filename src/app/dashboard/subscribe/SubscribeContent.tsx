@@ -34,15 +34,15 @@ function BlockedForNonPayment() {
       <div className="text-center">
         <h1 className="text-xl font-semibold text-ink-primary">Accès bloqué pour non-paiement</h1>
         <p className="mt-1 text-sm text-ink-secondary">
-          Le paiement de votre abonnement est en échec depuis plus de 3 jours. Pour retrouver l'accès à vos
-          projets existants, réglez la facture en attente — aucun nouvel abonnement n'est nécessaire.
+          Le paiement de votre abonnement est en échec depuis plus de 3 jours. Pour retrouver l&apos;accès à vos
+          projets existants, réglez la facture en attente — aucun nouvel abonnement n&apos;est nécessaire.
         </p>
       </div>
 
       <SettingsSection title="Facture en attente">
         <p className="text-sm text-ink-secondary">
           Vous serez redirigé vers Stripe pour mettre à jour votre moyen de paiement et régler le montant dû.
-          L'accès à vos projets reprendra automatiquement dès le paiement confirmé.
+          L&apos;accès à vos projets reprendra automatiquement dès le paiement confirmé.
         </p>
         <button
           type="button"

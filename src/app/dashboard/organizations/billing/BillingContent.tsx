@@ -254,7 +254,7 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
     return (
       <Modal open={open} onClose={onClose} title="Passage au plan Solo programmé">
         <p className="text-sm text-ink-secondary">
-          Votre abonnement Business reste actif jusqu'au {formatDate(scheduledFor)}. À cette date, il basculera
+          Votre abonnement Business reste actif jusqu&apos;au {formatDate(scheduledFor)}. À cette date, il basculera
           automatiquement vers le plan Solo, sans frais ni crédit — les projets non sélectionnés seront alors
           définitivement supprimés avec tout leur historique.
         </p>
@@ -276,7 +276,7 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
       ) : preview?.blockedByMembers ? (
         <p className="text-sm text-ink-secondary">
           Retirez les autres membres de votre organisation avant de repasser au plan Solo — le plan Solo ne peut
-          avoir qu'un seul utilisateur.
+          avoir qu&apos;un seul utilisateur.
         </p>
       ) : (
         <div className="space-y-4">
@@ -306,11 +306,11 @@ function DowngradeToSoloModal({ open, onClose }: { open: boolean; onClose: () =>
             </>
           ) : (
             <p className="text-sm text-ink-secondary">
-              Votre organisation sera dissoute et l'abonnement repassera à votre compte personnel.
+              Votre organisation sera dissoute et l&apos;abonnement repassera à votre compte personnel.
             </p>
           )}
           <p className="text-xs text-ink-muted">
-            Vous conservez le plan Business jusqu'à la fin de votre période de facturation en cours — aucun montant
+            Vous conservez le plan Business jusqu&apos;à la fin de votre période de facturation en cours — aucun montant
             supplémentaire ne sera prélevé, aucun crédit ne sera accordé.
           </p>
           {error && <p className="text-sm text-status-critical">{error}</p>}

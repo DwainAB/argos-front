@@ -83,7 +83,7 @@ export function ProjectSharesSection({ projectId }: { projectId: string }) {
         {loading ? (
           <p className="text-sm text-ink-secondary">Chargement...</p>
         ) : shares.length === 0 ? (
-          <p className="text-sm text-ink-secondary">Ce projet n'est partagé avec personne pour l'instant.</p>
+          <p className="text-sm text-ink-secondary">Ce projet n&apos;est partagé avec personne pour l&apos;instant.</p>
         ) : (
           shares.map((share) => (
             <li

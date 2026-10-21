@@ -49,7 +49,7 @@ export function PaymentGraceBanner() {
     return (
       <div className="border-b border-status-warning/30 bg-status-warning/10 px-4 py-2 text-center text-sm text-ink-primary">
         Le dernier paiement de votre abonnement a échoué. Réglez-le avant le{" "}
-        {formatDate(user.paymentGraceDeadline)}, sous peine de blocage de l'accès —{" "}
+        {formatDate(user.paymentGraceDeadline)}, sous peine de blocage de l&apos;accès —{" "}
         <UpdatePaymentMethodLink>mettre à jour mon moyen de paiement</UpdatePaymentMethodLink>.
       </div>
     );

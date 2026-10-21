@@ -196,7 +196,7 @@ function InvitationsSection({
           >
             <div>
               <p className="text-sm text-ink-primary">{invitation.email}</p>
-              <p className="text-xs text-ink-muted">En attente d'inscription</p>
+              <p className="text-xs text-ink-muted">En attente d&apos;inscription</p>
             </div>
             <div className="flex items-center gap-3">
               <RoleBadge role={invitation.role} />
@@ -252,7 +252,7 @@ export function OrganizationContent() {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-lg font-semibold text-ink-primary">{organization.name}</h1>
-        <p className="text-sm text-ink-secondary">Gestion des membres de l'organisation.</p>
+        <p className="text-sm text-ink-secondary">Gestion des membres de l&apos;organisation.</p>
       </div>
 
       <MembersSection members={organization.members} myUserId={user.id} isAdmin={isAdmin} onChanged={refetch} />
