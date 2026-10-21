@@ -9,21 +9,23 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Limite le nombre de workers en parallèle : un par fichier de test par défaut (39
-  // fichiers ici) sature la machine une fois l'instrumentation v8 coverage activée,
-  // provoquant des faux timeouts (tests qui mettent >150s à finir alors qu'ils sont
-  // instantanés isolément) — jamais observé avec `npm run test` seul, seulement avec
-  // `--coverage`. Top-level (pas sous `test`) depuis Vitest 4+ — voir guide de migration.
-  pool: "forks",
-  poolOptions: {
-    forks: {
-      maxForks: 4,
-    },
-  },
   test: {
     environment: "jsdom",
     globals: false,
     setupFiles: ["./src/test/setup.ts"],
+    // Limite le nombre de workers en parallèle : un par fichier de test par défaut (39
+    // fichiers ici) sature la machine une fois l'instrumentation v8 coverage activée,
+    // provoquant des faux timeouts (tests qui mettent >150s à finir alors qu'ils sont
+    // instantanés isolément) — jamais observé avec `npm run test` seul, seulement avec
+    // `--coverage`. Placé ici (sous `test`) car c'est le seul emplacement reconnu par le
+    // typage de `defineConfig` dans cette version de vitest/config — le runtime accepte
+    // aussi bien ici qu'au niveau racine, seul le typage TypeScript diffère.
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        maxForks: 4,
+      },
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
