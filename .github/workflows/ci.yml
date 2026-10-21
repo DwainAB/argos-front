@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      # Le déploiement en lui-même est géré par l'intégration GitHub de Vercel (déclenchée
+      # séparément à chaque push sur main) — ce build ne sert qu'à vérifier que le projet
+      # compile avant que ce code n'atteigne Vercel, pas à publier quoi que ce soit.
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000
