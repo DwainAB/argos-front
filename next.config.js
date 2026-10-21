@@ -7,17 +7,19 @@
 // - avatars.githubusercontent.com : avatars affichés pour les installations/connexions GitHub
 // - l'API backend (NEXT_PUBLIC_API_URL) : tous les appels fetch (apiFetch) et les popups
 //   OAuth GitHub/GitLab, qui redirigent vers ce domaine avant de revenir
+// - va.vercel-scripts.com / vitals.vercel-insights.com : script et envoi des mesures de
+//   @vercel/analytics (mesure d'audience, voir layout.tsx)
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   // 'unsafe-inline' nécessaire pour les styles injectés par Next.js lui-même (CSS-in-JS des
   // styles globaux) ; 'unsafe-eval' pour le hot-reload en développement uniquement.
-  "script-src 'self' 'unsafe-inline' https://accounts.google.com",
+  "script-src 'self' 'unsafe-inline' https://accounts.google.com https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://avatars.githubusercontent.com",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiUrl} https://accounts.google.com`,
+  `connect-src 'self' ${apiUrl} https://accounts.google.com https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
   `frame-src https://accounts.google.com`,
   // Empêche le site d'être affiché dans une <iframe> sur un autre domaine (clickjacking) —
   // équivalent CSP de l'en-tête X-Frame-Options: DENY, plus flexible (frame-ancestors 'self'
