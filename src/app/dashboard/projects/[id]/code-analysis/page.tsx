@@ -135,7 +135,7 @@ export default function ProjectCodeAnalysisPage({ params }: { params: { id: stri
 
       {!hasRepo ? (
         <p className="rounded-xl border border-surface-border/10 bg-surface-raised p-4 text-sm text-ink-secondary">
-          Ce projet n'a pas de dépôt GitHub ou GitLab connecté — connectez-en un depuis les intégrations pour lancer
+          Ce projet n&apos;a pas de dépôt GitHub ou GitLab connecté — connectez-en un depuis les intégrations pour lancer
           une analyse.
         </p>
       ) : (
@@ -180,9 +180,9 @@ export default function ProjectCodeAnalysisPage({ params }: { params: { id: stri
 
       <div className="overflow-hidden rounded-xl border border-surface-border/10 bg-surface-raised">
         {loading ? (
-          <p className="px-4 py-6 text-center text-sm text-ink-secondary">Chargement de l'historique...</p>
+          <p className="px-4 py-6 text-center text-sm text-ink-secondary">Chargement de l&apos;historique...</p>
         ) : analyses.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-ink-secondary">Aucune analyse pour ce projet pour l'instant.</p>
+          <p className="px-4 py-6 text-center text-sm text-ink-secondary">Aucune analyse pour ce projet pour l&apos;instant.</p>
         ) : (
           <ul className="divide-y divide-surface-border/10">
             {analyses.map((analysis) => (

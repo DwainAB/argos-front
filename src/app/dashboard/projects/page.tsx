@@ -57,7 +57,7 @@ export default function AllProjectsPage() {
           <p className="px-4 py-6 text-center text-sm text-ink-secondary">Chargement des projets...</p>
         ) : projects.length === 0 ? (
           <div className="px-4 py-8 text-center">
-            <p className="text-sm text-ink-secondary">Vous n'avez actuellement aucun projet connecté.</p>
+            <p className="text-sm text-ink-secondary">Vous n&apos;avez actuellement aucun projet connecté.</p>
           </div>
         ) : (
           <ul className="divide-y divide-surface-border/10">

@@ -749,7 +749,7 @@ function GithubRepoPicker({
 
       {repos && repos.length === 0 && (
         <p className="text-sm text-ink-secondary">
-          Aucun dépôt accessible. Vérifiez que l'installation GitHub a bien accès à au moins un dépôt.
+          Aucun dépôt accessible. Vérifiez que l&apos;installation GitHub a bien accès à au moins un dépôt.
         </p>
       )}
 

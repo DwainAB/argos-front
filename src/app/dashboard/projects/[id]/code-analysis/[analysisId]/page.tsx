@@ -228,7 +228,7 @@ export default function CodeAnalysisDetailPage({ params }: { params: { id: strin
   }
 
   if (loading) {
-    return <p className="text-sm text-ink-secondary">Chargement de l'analyse...</p>;
+    return <p className="text-sm text-ink-secondary">Chargement de l&apos;analyse...</p>;
   }
 
   if (loadError || !analysis) {
@@ -270,7 +270,7 @@ export default function CodeAnalysisDetailPage({ params }: { params: { id: strin
 
       {analysis.status === "failed" && (
         <p className="rounded-xl border border-status-critical/20 bg-status-critical/5 p-4 text-sm text-status-critical">
-          L'analyse a échoué{analysis.errorMessage ? ` : ${analysis.errorMessage}` : "."}
+          L&apos;analyse a échoué{analysis.errorMessage ? ` : ${analysis.errorMessage}` : "."}
         </p>
       )}
 

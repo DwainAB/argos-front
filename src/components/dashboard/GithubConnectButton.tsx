@@ -109,7 +109,7 @@ export function GithubConnectButton({ projectId, disabled, onResult, children, c
             {installations && installations.length > 0 && (
               <div>
                 <p className="mb-2 text-sm text-ink-secondary">
-                  L'app GitHub Argos AI est déjà installée sur ces comptes :
+                  L&apos;app GitHub Argos AI est déjà installée sur ces comptes :
                 </p>
                 <ul className="space-y-2">
                   {installations.map((installation) => (

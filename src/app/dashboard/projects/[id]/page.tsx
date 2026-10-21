@@ -107,7 +107,7 @@ export default function ProjectOverviewPage({ params }: { params: { id: string }
       <LogsTimeseriesChart projectId={params.id} />
 
       <p className="text-xs text-ink-muted">
-        Les alertes détaillées seront disponibles une fois l'analyse IA des logs branchée. Consultez la page{" "}
+        Les alertes détaillées seront disponibles une fois l&apos;analyse IA des logs branchée. Consultez la page{" "}
         <span className="text-ink-secondary">Logs</span> pour voir le flux brut en temps réel.
       </p>
     </div>
