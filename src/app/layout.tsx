@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
+import { ClerkProvider } from "@clerk/nextjs";
+import { frFR } from "@clerk/localizations";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
@@ -50,16 +52,39 @@ const themeInitScript = `
 })();
 `;
 
+// Composants Clerk (connexion, inscription, profil) aux couleurs de la marque — les couleurs
+// de fond/texte suivent les variables CSS du thème, pour rester lisibles en clair comme en sombre.
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#3B82F6",
+    colorBackground: "rgb(var(--surface-raised))",
+    colorInputBackground: "rgb(var(--surface))",
+    colorText: "rgb(var(--ink-primary))",
+    colorTextSecondary: "rgb(var(--ink-secondary))",
+    colorInputText: "rgb(var(--ink-primary))",
+    borderRadius: "0.5rem",
+  },
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr" className="dark">
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
-        <Analytics />
-      </body>
-    </html>
+    <ClerkProvider
+      localization={frFR}
+      appearance={clerkAppearance}
+      signInUrl="/login"
+      signUpUrl="/signup"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/onboarding"
+    >
+      <html lang="fr" className="dark">
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        </head>
+        <body>
+          <ThemeProvider>{children}</ThemeProvider>
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
