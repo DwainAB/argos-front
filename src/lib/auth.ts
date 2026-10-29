@@ -20,6 +20,12 @@ export type CurrentUser = {
 
 export class ApiAuthError extends Error {}
 
+// Session Clerk valide mais compte Argos AI pas encore configuré : le backend répond 403
+// avec ce code tant que l'onboarding n'a pas été terminé.
+export class OnboardingRequiredError extends Error {}
+
+const ONBOARDING_REQUIRED = "ONBOARDING_REQUIRED";
+
 async function parseJsonOrThrow(res: Response) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -28,64 +34,18 @@ async function parseJsonOrThrow(res: Response) {
   return data;
 }
 
-export async function signup(input: {
-  email: string;
-  password: string;
+// Crée le compte Argos AI d'un utilisateur déjà inscrit chez Clerk (type de compte,
+// organisation). L'email n'est jamais envoyé : le backend le lit directement chez Clerk.
+export async function completeOnboarding(input: {
   firstName: string;
   lastName: string;
   accountType: AccountType;
   organizationName?: string;
 }) {
-  const res = await apiFetch("/api/auth/signup", {
+  const res = await apiFetch("/api/auth/onboarding", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.user as CurrentUser;
-}
-
-export async function login(input: { email: string; password: string }) {
-  const res = await apiFetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.user as CurrentUser;
-}
-
-export async function logout() {
-  await apiFetch("/api/auth/logout", { method: "POST" });
-}
-
-// idToken vient de Google Identity Services (bouton "Continuer avec Google", flux 100%
-// frontend) — vérifié côté backend avant toute connexion.
-export async function loginWithGoogle(idToken: string) {
-  const res = await apiFetch("/api/auth/google", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.user as CurrentUser;
-}
-
-export async function loginWithGitlab(params: { gitlabUserId: number; gitlabUserEmail: string | null }) {
-  const res = await apiFetch("/api/auth/gitlab", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.user as CurrentUser;
-}
-
-export async function loginWithGithub(params: { githubUserId: number; githubUserEmail: string | null }) {
-  const res = await apiFetch("/api/auth/github", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
   });
   const data = await parseJsonOrThrow(res);
   return data.user as CurrentUser;
@@ -101,36 +61,6 @@ export async function updatePhone(phone: string) {
   return data.user as CurrentUser;
 }
 
-export async function changePassword(input: { currentPassword: string; newPassword: string }) {
-  const res = await apiFetch("/api/auth/password", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.user as CurrentUser;
-}
-
-export async function forgotPassword(email: string) {
-  const res = await apiFetch("/api/auth/forgot-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.message as string;
-}
-
-export async function resetPassword(input: { token: string; newPassword: string }) {
-  const res = await apiFetch("/api/auth/reset-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  const data = await parseJsonOrThrow(res);
-  return data.message as string;
-}
-
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const res = await apiFetch("/api/auth/me");
 
@@ -138,6 +68,13 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     return null;
   }
 
-  const data = await parseJsonOrThrow(res);
+  const data = await res.json().catch(() => ({}));
+
+  if (res.status === 403 && data.code === ONBOARDING_REQUIRED) {
+    throw new OnboardingRequiredError();
+  }
+  if (!res.ok) {
+    throw new ApiAuthError(data.error ?? "Une erreur est survenue.");
+  }
   return data.user as CurrentUser;
 }

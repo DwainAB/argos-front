@@ -36,8 +36,9 @@ export function GitlabConnectButton({ disabled, onResult, children, className }:
 
   useEffect(() => {
     async function handleMessage(event: MessageEvent) {
-      // Le popup callback est servi par le backend (API_URL), pas par le frontend — voir
-      // GitlabSignInButton.tsx pour le détail de ce correctif.
+      // Le popup callback est servi par le backend (API_URL, ex: localhost:4000 en dev),
+      // pas par le frontend (window.location.origin) — comparer contre ce dernier rejetait
+      // à tort le message, empêchant toute connexion de se terminer.
       if (event.origin !== new URL(API_URL).origin) return;
       if (!event.data || event.data.source !== "argos-gitlab-connect") return;
 

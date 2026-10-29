@@ -3,24 +3,29 @@
 // première ligne de défense contre l'injection de scripts malveillants (XSS).
 //
 // Origines externes réellement utilisées par l'app (vérifié dans le code) :
-// - accounts.google.com : SDK Google Identity Services (bouton "Continuer avec Google")
+// - Clerk (authentification) : son Frontend API (*.clerk.accounts.dev en développement,
+//   clerk.ai-argos.com en production), img.clerk.com (avatars) et challenges.cloudflare.com
+//   (protection anti-bot de l'inscription) — liste issue de la documentation CSP de Clerk
 // - avatars.githubusercontent.com : avatars affichés pour les installations/connexions GitHub
 // - l'API backend (NEXT_PUBLIC_API_URL) : tous les appels fetch (apiFetch) et les popups
 //   OAuth GitHub/GitLab, qui redirigent vers ce domaine avant de revenir
 // - va.vercel-scripts.com / vitals.vercel-insights.com : script et envoi des mesures de
 //   @vercel/analytics (mesure d'audience, voir layout.tsx)
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const clerkFrontendApi = "https://*.clerk.accounts.dev https://clerk.ai-argos.com";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   // 'unsafe-inline' nécessaire pour les styles injectés par Next.js lui-même (CSS-in-JS des
   // styles globaux) ; 'unsafe-eval' pour le hot-reload en développement uniquement.
-  "script-src 'self' 'unsafe-inline' https://accounts.google.com https://va.vercel-scripts.com",
+  `script-src 'self' 'unsafe-inline' ${clerkFrontendApi} https://challenges.cloudflare.com https://va.vercel-scripts.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://avatars.githubusercontent.com",
+  "img-src 'self' data: https://avatars.githubusercontent.com https://img.clerk.com",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiUrl} https://accounts.google.com https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
-  `frame-src https://accounts.google.com`,
+  `connect-src 'self' ${apiUrl} ${clerkFrontendApi} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
+  "frame-src https://challenges.cloudflare.com",
+  // Clerk exécute une partie de sa gestion de session dans un Web Worker créé depuis un blob.
+  "worker-src 'self' blob:",
   // Empêche le site d'être affiché dans une <iframe> sur un autre domaine (clickjacking) —
   // équivalent CSP de l'en-tête X-Frame-Options: DENY, plus flexible (frame-ancestors 'self'
   // autoriserait un cadrage par le site lui-même si jamais utile, DENY ici car jamais le cas).

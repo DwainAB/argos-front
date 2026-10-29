@@ -2,14 +2,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+const openUserProfile = vi.fn();
+
 vi.mock("@/lib/api-fetch", () => ({ apiFetch: vi.fn() }));
+vi.mock("@clerk/nextjs", () => ({ useClerk: () => ({ openUserProfile }) }));
 vi.mock("@/lib/auth", async () => {
   const actual = await vi.importActual<typeof import("@/lib/auth")>("@/lib/auth");
-  return { ...actual, changePassword: vi.fn(), updatePhone: vi.fn() };
+  return { ...actual, updatePhone: vi.fn() };
 });
 
 import { apiFetch } from "@/lib/api-fetch";
-import { ApiAuthError, changePassword, updatePhone } from "@/lib/auth";
+import { updatePhone } from "@/lib/auth";
 import { UserProvider } from "@/components/dashboard/UserContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import type { CurrentUser } from "@/lib/auth";
@@ -50,7 +53,7 @@ function jsonResponse(data: unknown, ok = true) {
 
 beforeEach(() => {
   vi.mocked(apiFetch).mockReset();
-  vi.mocked(changePassword).mockReset();
+  openUserProfile.mockReset();
   vi.mocked(updatePhone).mockReset();
   // Les deux sections (clés Render, connexions GitHub) fetchent au montage : réponse vide par
   // défaut pour ne pas laisser de promesse non résolue dans les tests qui ne les concernent pas.
@@ -62,41 +65,12 @@ beforeEach(() => {
 });
 
 describe("AccountSettingsPage", () => {
-  it("affiche la section de changement de mot de passe et refuse un mot de passe trop court", async () => {
+  it("ouvre la gestion du compte Clerk (mot de passe, comptes liés)", async () => {
     renderPage();
 
-    await userEvent.type(screen.getByLabelText(/mot de passe actuel/i), "ancien");
-    await userEvent.type(screen.getByLabelText(/^nouveau mot de passe$/i), "court");
-    await userEvent.type(screen.getByLabelText(/confirmer le nouveau mot de passe/i), "court");
-    await userEvent.click(screen.getByRole("button", { name: /mettre à jour le mot de passe/i }));
+    await userEvent.click(screen.getByRole("button", { name: /gérer mon compte/i }));
 
-    expect(screen.getByText(/au moins 8 caractères/i)).toBeInTheDocument();
-    expect(changePassword).not.toHaveBeenCalled();
-  });
-
-  it("met à jour le mot de passe avec succès", async () => {
-    vi.mocked(changePassword).mockResolvedValue({} as never);
-    renderPage();
-
-    await userEvent.type(screen.getByLabelText(/mot de passe actuel/i), "ancien123");
-    await userEvent.type(screen.getByLabelText(/^nouveau mot de passe$/i), "nouveau123");
-    await userEvent.type(screen.getByLabelText(/confirmer le nouveau mot de passe/i), "nouveau123");
-    await userEvent.click(screen.getByRole("button", { name: /mettre à jour le mot de passe/i }));
-
-    expect(await screen.findByText("Mot de passe mis à jour.")).toBeInTheDocument();
-    expect(changePassword).toHaveBeenCalledWith({ currentPassword: "ancien123", newPassword: "nouveau123" });
-  });
-
-  it("affiche l'erreur de l'API si le changement de mot de passe échoue", async () => {
-    vi.mocked(changePassword).mockRejectedValue(new ApiAuthError("Mot de passe actuel incorrect."));
-    renderPage();
-
-    await userEvent.type(screen.getByLabelText(/mot de passe actuel/i), "faux");
-    await userEvent.type(screen.getByLabelText(/^nouveau mot de passe$/i), "nouveau123");
-    await userEvent.type(screen.getByLabelText(/confirmer le nouveau mot de passe/i), "nouveau123");
-    await userEvent.click(screen.getByRole("button", { name: /mettre à jour le mot de passe/i }));
-
-    expect(await screen.findByText("Mot de passe actuel incorrect.")).toBeInTheDocument();
+    expect(openUserProfile).toHaveBeenCalled();
   });
 
   it("enregistre le numéro de téléphone", async () => {
