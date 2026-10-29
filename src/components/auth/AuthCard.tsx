@@ -3,7 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { CircuitBackground } from "@/components/landing/CircuitBackground";
 
-export function SignupCard({ subtitle, children }: { subtitle: string; children: ReactNode }) {
+// Fond et en-tête communs aux pages d'authentification (connexion, inscription, onboarding),
+// autour des composants Clerk ou d'un formulaire propre à Argos AI.
+export function AuthCard({ subtitle, children }: { subtitle: string; children: ReactNode }) {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
@@ -16,7 +18,7 @@ export function SignupCard({ subtitle, children }: { subtitle: string; children:
         <div className="absolute left-1/2 top-1/4 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-500/10 blur-[120px]" />
       </div>
 
-      <div className="w-full max-w-sm">
+      <div className="flex w-full max-w-md flex-col items-center">
         <Link href="/" className="mb-8 flex flex-col items-center text-center">
           <Image src="/logo-argos.png" alt="Argos AI" width={40} height={40} className="mb-2 h-10 w-10" />
           <h1 className="text-xl font-semibold text-ink-primary">Argos AI</h1>
@@ -24,13 +26,6 @@ export function SignupCard({ subtitle, children }: { subtitle: string; children:
         </Link>
 
         {children}
-
-        <p className="mt-6 text-center text-sm text-ink-secondary">
-          Déjà un compte ?{" "}
-          <Link href="/login" className="text-accent-400 hover:text-accent-300">
-            Se connecter
-          </Link>
-        </p>
       </div>
     </main>
   );

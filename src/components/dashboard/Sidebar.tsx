@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSidebar } from "./SidebarContext";
 import { useCurrentUser } from "./UserContext";
 import { Modal } from "./Modal";
 import { apiFetch } from "@/lib/api-fetch";
-import { logout } from "@/lib/auth";
+import { useClerk } from "@clerk/nextjs";
 import { useProjects } from "@/lib/use-projects";
 import {
   IconOverview,
@@ -58,7 +58,6 @@ function getProjectNavItems(projectId: string, alertsCount: number): NavItem[] {
 }
 
 export function Sidebar() {
-  const router = useRouter();
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebar();
   const user = useCurrentUser();
@@ -72,9 +71,10 @@ export function Sidebar() {
   const [alertsCount, setAlertsCount] = useState(0);
   const [confirmingLogout, setConfirmingLogout] = useState(false);
 
+  const { signOut } = useClerk();
+
   const handleLogout = async () => {
-    await logout();
-    router.push("/login");
+    await signOut({ redirectUrl: "/login" });
   };
 
   useEffect(() => {

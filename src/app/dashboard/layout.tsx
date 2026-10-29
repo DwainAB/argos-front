@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { UserProvider } from "@/components/dashboard/UserContext";
 import { PaymentGraceBanner } from "@/components/dashboard/PaymentGraceBanner";
-import { getCurrentUser, type CurrentUser } from "@/lib/auth";
+import { getCurrentUser, OnboardingRequiredError, type CurrentUser } from "@/lib/auth";
 
 // Seule page accessible sans abonnement actif — sert justement à en démarrer un.
 const SUBSCRIBE_PATH = "/dashboard/subscribe";
@@ -40,8 +40,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           setUser(fetchedUser);
         })
         .catch((err) => {
+          if (cancelled) return;
+          // Connecté chez Clerk mais compte Argos AI pas encore configuré.
+          if (err instanceof OnboardingRequiredError) {
+            router.replace("/onboarding");
+            return;
+          }
           console.error("Erreur lors de la vérification de la session :", err);
-          if (!cancelled) router.replace("/login");
+          router.replace("/login");
         });
     };
 
