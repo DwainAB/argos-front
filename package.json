@@ -14,6 +14,7 @@
   "dependencies": {
     "@clerk/localizations": "^3.37.10",
     "@clerk/nextjs": "^6.39.7",
+    "@clerk/themes": "^2.4.63",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@vercel/analytics": "^2.0.1",
