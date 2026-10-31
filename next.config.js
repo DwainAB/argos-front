@@ -16,12 +16,15 @@
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 const clerkFrontendApi = "https://*.clerk.accounts.dev https://clerk.ai-argos.com";
 const clerkBotProtection = "https://cdn.protect.clerk.com";
+// Next.js évalue du code à la volée pour le rechargement à chaud en développement : sans
+// 'unsafe-eval', le JavaScript de la page plante (et Clerk avec). Jamais ajouté en production.
+const devOnlyEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   // 'unsafe-inline' nécessaire pour les styles injectés par Next.js lui-même (CSS-in-JS des
   // styles globaux) ; 'unsafe-eval' pour le hot-reload en développement uniquement.
-  `script-src 'self' 'unsafe-inline' ${clerkFrontendApi} ${clerkBotProtection} https://challenges.cloudflare.com https://va.vercel-scripts.com`,
+  `script-src 'self' 'unsafe-inline'${devOnlyEval} ${clerkFrontendApi} ${clerkBotProtection} https://challenges.cloudflare.com https://va.vercel-scripts.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://avatars.githubusercontent.com https://img.clerk.com",
   "font-src 'self' data:",
