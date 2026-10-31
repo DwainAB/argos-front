@@ -1,8 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { SidebarProvider } from "@/components/dashboard/SidebarContext";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
@@ -17,6 +18,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<CurrentUser | null>(null);
+  const { userId: clerkUserId } = useAuth();
+  const previousClerkUserId = useRef(clerkUserId);
+
+  // Bascule vers un autre compte depuis le menu compte (mode multi-session de Clerk) :
+  // rechargement complet du dashboard, pour qu'aucun composant ne garde en mémoire les
+  // projets ou l'abonnement du compte précédent.
+  useEffect(() => {
+    if (previousClerkUserId.current && clerkUserId && previousClerkUserId.current !== clerkUserId) {
+      window.location.assign("/dashboard");
+    }
+    previousClerkUserId.current = clerkUserId;
+  }, [clerkUserId]);
 
   useEffect(() => {
     let cancelled = false;

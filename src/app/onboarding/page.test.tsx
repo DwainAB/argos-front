@@ -4,10 +4,15 @@ import userEvent from "@testing-library/user-event";
 
 const replace = vi.fn();
 const push = vi.fn();
+const signOut = vi.fn();
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace, push }) }));
 vi.mock("@clerk/nextjs", () => ({
-  useUser: () => ({ isLoaded: true, user: { firstName: "Jean", lastName: "Dupont" } }),
+  useUser: () => ({
+    isLoaded: true,
+    user: { firstName: "Jean", lastName: "Dupont", primaryEmailAddress: { emailAddress: "jean@example.com" } },
+  }),
+  useClerk: () => ({ signOut }),
 }));
 vi.mock("@/components/landing/CircuitBackground", () => ({ CircuitBackground: () => null }));
 vi.mock("@/lib/auth", async () => {
@@ -21,6 +26,7 @@ import OnboardingPage from "./page";
 beforeEach(() => {
   replace.mockReset();
   push.mockReset();
+  signOut.mockReset();
   vi.mocked(completeOnboarding).mockReset();
   vi.mocked(getCurrentUser).mockReset().mockRejectedValue(new OnboardingRequiredError());
 });
@@ -66,5 +72,14 @@ describe("OnboardingPage", () => {
 
     expect(await screen.findByText("Un compte existe déjà avec cet email.")).toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it("affiche le compte connecté et permet de se déconnecter pour changer de compte", async () => {
+    render(<OnboardingPage />);
+
+    expect(await screen.findByText("jean@example.com")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /ce n'est pas vous/i }));
+
+    expect(signOut).toHaveBeenCalledWith({ redirectUrl: "/login" });
   });
 });

@@ -5,11 +5,16 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // vérifiée ensuite côté backend, voir dashboard/layout.tsx.
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/onboarding(.*)"]);
 
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect();
-  }
-});
+// signInUrl/signUpUrl explicites : sans eux, auth.protect() renvoie vers la page de
+// connexion hébergée par Clerk (accounts.ai-argos.com) au lieu de nos pages /login et /signup.
+export default clerkMiddleware(
+  async (auth, req) => {
+    if (isProtectedRoute(req)) {
+      await auth.protect();
+    }
+  },
+  { signInUrl: "/login", signUpUrl: "/signup" },
+);
 
 export const config = {
   matcher: [

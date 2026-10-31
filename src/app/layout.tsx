@@ -75,6 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       signUpUrl="/signup"
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/onboarding"
+      afterSignOutUrl="/login"
     >
       <html lang="fr" className="dark">
         <head>
