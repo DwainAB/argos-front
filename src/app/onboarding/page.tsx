@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { ApiAuthError, completeOnboarding, getCurrentUser, OnboardingRequiredError, type AccountType } from "@/lib/auth";
 
@@ -20,6 +20,7 @@ const ACCOUNT_TYPES: { value: AccountType; label: string; description: string }[
 export default function OnboardingPage() {
   const router = useRouter();
   const { user: clerkUser, isLoaded } = useUser();
+  const { signOut } = useClerk();
 
   const [checking, setChecking] = useState(true);
   const [accountType, setAccountType] = useState<AccountType>("personal");
@@ -176,6 +177,19 @@ export default function OnboardingPage() {
           </button>
         </form>
       </div>
+
+      {/* Mauvais compte (plusieurs comptes sur le même navigateur) : sans ce lien, impossible
+          de sortir de l'onboarding pour se reconnecter avec le bon. */}
+      <p className="mt-4 text-center text-xs text-ink-muted">
+        Connecté en tant que <span className="text-ink-secondary">{clerkUser?.primaryEmailAddress?.emailAddress}</span>.{" "}
+        <button
+          type="button"
+          onClick={() => signOut({ redirectUrl: "/login" })}
+          className="text-accent-400 hover:text-accent-300"
+        >
+          Ce n&apos;est pas vous ? Se déconnecter
+        </button>
+      </p>
     </AuthCard>
   );
 }
