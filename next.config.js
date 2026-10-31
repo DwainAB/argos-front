@@ -4,7 +4,9 @@
 //
 // Origines externes réellement utilisées par l'app (vérifié dans le code) :
 // - Clerk (authentification) : son Frontend API (*.clerk.accounts.dev en développement,
-//   clerk.ai-argos.com en production), img.clerk.com (avatars) et challenges.cloudflare.com
+//   clerk.ai-argos.com en production), img.clerk.com (avatars), challenges.cloudflare.com
+//   et cdn.protect.clerk.com (protection anti-bot : sans ce script, Clerk rejette les
+//   inscriptions en 403 comme suspectes)
 //   (protection anti-bot de l'inscription) — liste issue de la documentation CSP de Clerk
 // - avatars.githubusercontent.com : avatars affichés pour les installations/connexions GitHub
 // - l'API backend (NEXT_PUBLIC_API_URL) : tous les appels fetch (apiFetch) et les popups
@@ -13,16 +15,17 @@
 //   @vercel/analytics (mesure d'audience, voir layout.tsx)
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 const clerkFrontendApi = "https://*.clerk.accounts.dev https://clerk.ai-argos.com";
+const clerkBotProtection = "https://cdn.protect.clerk.com";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   // 'unsafe-inline' nécessaire pour les styles injectés par Next.js lui-même (CSS-in-JS des
   // styles globaux) ; 'unsafe-eval' pour le hot-reload en développement uniquement.
-  `script-src 'self' 'unsafe-inline' ${clerkFrontendApi} https://challenges.cloudflare.com https://va.vercel-scripts.com`,
+  `script-src 'self' 'unsafe-inline' ${clerkFrontendApi} ${clerkBotProtection} https://challenges.cloudflare.com https://va.vercel-scripts.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://avatars.githubusercontent.com https://img.clerk.com",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiUrl} ${clerkFrontendApi} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
+  `connect-src 'self' ${apiUrl} ${clerkFrontendApi} ${clerkBotProtection} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
   "frame-src https://challenges.cloudflare.com",
   // Clerk exécute une partie de sa gestion de session dans un Web Worker créé depuis un blob.
   "worker-src 'self' blob:",
