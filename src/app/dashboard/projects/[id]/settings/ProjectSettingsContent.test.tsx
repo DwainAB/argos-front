@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+const push = vi.hoisted(() => vi.fn());
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 vi.mock("@/lib/api-fetch", () => ({ apiFetch: vi.fn() }));
 vi.mock("@/components/dashboard/GithubConnectButton", () => ({
   GithubConnectButton: ({ onResult }: { onResult: (r: unknown) => void }) => (
@@ -86,6 +89,7 @@ function renderWithProject(project: ApiProject | null, user = makeUser()) {
 
 beforeEach(() => {
   vi.mocked(apiFetch).mockReset();
+  push.mockReset();
 });
 
 describe("ProjectSettingsContent", () => {
@@ -177,5 +181,48 @@ describe("ProjectSettingsContent", () => {
 
     await screen.findByText(/configuration de mon projet/i);
     expect(screen.queryByTestId("project-shares-section")).not.toBeInTheDocument();
+  });
+
+  function mockDeleteResponse(response: Response) {
+    vi.mocked(apiFetch).mockImplementation((path: string, options?: RequestInit) => {
+      if (options?.method === "DELETE") return Promise.resolve(response);
+      if (path === "/api/projects") return Promise.resolve(jsonResponse({ projects: [makeProject()] }));
+      return Promise.resolve(jsonResponse({}));
+    });
+
+    return render(
+      <UserProvider user={makeUser()}>
+        <ProjectSettingsContent projectId="proj-1" />
+      </UserProvider>,
+    );
+  }
+
+  it("ne supprime rien tant que la suppression n'est pas confirmée", async () => {
+    mockDeleteResponse(jsonResponse({}));
+
+    await userEvent.click(await screen.findByRole("button", { name: "Supprimer le projet" }));
+    await userEvent.click(screen.getByRole("button", { name: "Annuler" }));
+
+    expect(apiFetch).not.toHaveBeenCalledWith("/api/projects/proj-1", expect.objectContaining({ method: "DELETE" }));
+  });
+
+  it("supprime le projet après confirmation puis revient à la liste", async () => {
+    mockDeleteResponse(jsonResponse({}));
+
+    await userEvent.click(await screen.findByRole("button", { name: "Supprimer le projet" }));
+    await userEvent.click(screen.getByRole("button", { name: "Confirmer la suppression" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/dashboard/projects"));
+    expect(apiFetch).toHaveBeenCalledWith("/api/projects/proj-1", { method: "DELETE" });
+  });
+
+  it("affiche l'erreur du serveur si la suppression échoue", async () => {
+    mockDeleteResponse(jsonResponse({ error: "Accès refusé." }, false));
+
+    await userEvent.click(await screen.findByRole("button", { name: "Supprimer le projet" }));
+    await userEvent.click(screen.getByRole("button", { name: "Confirmer la suppression" }));
+
+    expect(await screen.findByText("Accès refusé.")).toBeInTheDocument();
+    expect(push).not.toHaveBeenCalled();
   });
 });
