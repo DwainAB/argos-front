@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api-fetch";
 import { useProjects } from "@/lib/use-projects";
 import { useCurrentUser } from "@/components/dashboard/UserContext";
@@ -11,6 +12,7 @@ import { GitlabConnectButton } from "@/components/dashboard/GitlabConnectButton"
 import { ProjectSharesSection } from "@/components/dashboard/ProjectSharesSection";
 import { ProjectOwnerBadge } from "@/components/dashboard/ProjectOwnerBadge";
 import { ActorLabel } from "@/components/dashboard/ActorLabel";
+import { Modal } from "@/components/dashboard/Modal";
 
 type GithubRepo = {
   id: number;
@@ -28,6 +30,10 @@ type GitlabProject = {
 
 export function ProjectSettingsContent({ projectId }: { projectId: string }) {
   const currentUser = useCurrentUser();
+  const router = useRouter();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [githubInstallationId, setGithubInstallationId] = useState<string | null>(null);
   const [githubError, setGithubError] = useState<string | null>(null);
 
@@ -224,7 +230,24 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const res = await apiFetch(`/api/projects/${projectId}`, { method: "DELETE" });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Impossible de supprimer le projet.");
+      }
+
+      router.push("/dashboard/projects");
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Impossible de supprimer le projet.");
+      setConfirmingDelete(false);
+      setDeleting(false);
+    }
   };
 
   if (projectsLoading) {
@@ -468,12 +491,36 @@ export function ProjectSettingsContent({ projectId }: { projectId: string }) {
         </p>
         <button
           type="button"
-          onClick={handleDelete}
+          onClick={() => setConfirmingDelete(true)}
           className="mt-4 rounded-lg border border-status-critical/40 px-4 py-2 text-sm font-medium text-status-critical transition hover:bg-status-critical/10"
         >
           Supprimer le projet
         </button>
+        {deleteError && <p className="mt-2 text-sm text-status-critical">{deleteError}</p>}
       </section>
+
+      <Modal open={confirmingDelete} onClose={() => setConfirmingDelete(false)} title="Supprimer ce projet ?">
+        <p className="text-sm text-ink-secondary">
+          Le projet {project.name} et tout son historique seront supprimés. Cette action est irréversible.
+        </p>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete(false)}
+            className="rounded-lg border border-surface-border/10 bg-surface px-4 py-2 text-sm font-medium text-ink-primary transition hover:bg-surface-border/5"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="rounded-lg bg-status-critical px-4 py-2 text-sm font-medium text-white transition hover:bg-status-critical/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {deleting ? "Suppression..." : "Confirmer la suppression"}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
